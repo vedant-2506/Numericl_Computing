@@ -1,30 +1,48 @@
 #ifndef ROOT_HPP
 #define ROOT_HPP
 
-class bisect
-{
-private:
-    //store the left and right interval values
-    double a, b;
-    // tolerance value for stopping condition
-    double tol;
+#include <iostream>
+
+//base class
+class RootFinder{
+protected:
+    double tol;  //tolerance value
 
 public:
-     // constructor to initialize tolerance
-    bisect(double tolerance = 0.0001);
+    RootFinder(double tolerance = 0.0001);
+    virtual ~RootFinder() = default;
 
-    // function representing the mathematical equation f(x)
-     double f(double x);
+    virtual double f(double x);   //equation f(x)
 
-    // function to automatically find an interval [a, b]
-    int findInterval();
-
-
-    // function that applies the bisection method
-    double solve();
-
+    virtual double solve() = 0;    //method to find root
 };
 
-#endif
+//Bisection Methode
+class Bisection : public RootFinder{
+private:
+    double a,b;
+    bool findInterval();
+public:
+    Bisection(double tolerance = 0.0001);
+    double solve() override;  //override solve method
+};
 
+// Newton-Raphson Method
+class NewtonRaphson : public RootFinder{
+private:
+    double df(double x); // derivative of f(x)
+public:
+    NewtonRaphson(double tolerance = 0.0001);
+    double solve() override;  //override solve method
+};
 
+//Fixed Point Iteration Method
+class FixedPoint : public RootFinder{
+private:
+    double g(double x);   // function g(x) for fixed point iteration
+public:
+    FixedPoint(double tolerance = 0.0001);
+    double solve() override;  //override solve method
+};
+
+#endif // ROOT_HPP

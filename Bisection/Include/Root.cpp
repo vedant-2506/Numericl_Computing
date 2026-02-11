@@ -1,124 +1,136 @@
-#include<iostream>
-#include<cmath>
+#include <iostream>
+#include <cmath>
 #include <iomanip>
-#include "Root.hpp"
+#include "../Src/Root.hpp"
 
-
-// constructor definition: initialize members
-bisect::bisect(double tolerance)
-{
-    tol = tolerance;   // initialize tolerance member
-    a = 0.0;
-    b = 0.0;
+//Base class
+RootFinder::RootFinder(double tolerance) {
+    tol = tolerance;
 }
 
-// This is the equation 
-double bisect::f(double x)
-{
-    // return the calculated value of the equation
-
-    return  4 * x * x * x - 3 * x;     //// f(x) = 4x^3 - 3x
+double RootFinder::f(double x) {
+    // Define the function f(x) 
+    return 4*x*x*x - 3*x; 
 }
 
+// Bisection Method
+Bisection::Bisection(double tolerance) : RootFinder(tolerance){
+    a = 0;
+    b = 0;
+}
 
-// function to find a valid interval automatically f(left) * f(right) < 0
-int bisect::findInterval()
-{
+// Find an interval [a, b] where f(a) and f(b) have opposite signs
+bool Bisection::findInterval() {
     
-    double step = 0.05;         // step size used to scan the x-axis
+    double step = 0.05;
 
-    
-    for (int i = -100; i < 100; i++)
-    {
-        
-        double left = i * step;   // calculate left point of interval
+    for(int i=-100;i<100;i++){
+        double left =i*step;
+        double right = left + step;
 
-        
-        double right = left + step;   // calculate right point of interval
-
-        
-        if (f(left) * f(right) < 0)    // check if function values have opposite signs
-        {
-            // store the valid interval
+        if(f(left) * f(right) < 0) {
             a = left;
             b = right;
-
-            
-            return 1;   // interval found 
+            return true;
         }
     }
-
-    return 0;     // interval not found
+    return false;
 }
 
-
-
-// Function for  Bisection Method
-double bisect::solve()
-{
-    // find a valid interval 
-    if (!findInterval())
-    {
-        // If interval is not found
-        std::cout << "Could not find a valid interval\n";
+// Solve method for Bisection
+double Bisection::solve() {
+    if (!findInterval()) {
+        std::cout << "No valid interval found." << std::endl;
         return 0;
-    }
+}
 
+    double m_prev = a , m_curr = 0;
+    int iter = 1;
+    while(true){
+        m_curr = (a + b) / 2;
+        double fm = f(m_curr);
 
-    std::cout << "Starting interval: [" << a << ", " << b << "]\n";   //// starting interval
-
-    std::cout << "Tolerance: " << tol << "\n\n";     // tolerance value
-
-    std::cout  << "Iter\t" 
-               << "\t a \t" 
-               << "\t b\t" 
-              << "\t m\t" 
-              << "\tf(m)\n";    // table header 
-
-    
-    double m_prev = a;   //previous midpoint value 
-
-    double m_curr;      //current midpoint value
-    
-    int iter = 1;      //Iteration 
-    
-    while (true)
-    {
+        std::cout << iter << "\t"
+                  << std::setw(10) << a << "\t"
+                  << std::setw(10) << b << "\t"
+                  << std::setw(10) << m_curr << "\t"
+                  << fm << std::endl;
         
-        m_curr = (a + b) / 2;    // Calculate midpoint 
-
-        
-        double fm = f(m_curr);     // calculate function value at midpoint
-
-        // Print  iteration values
-        std::cout << iter << "\t "  
-         << std::setw(10) << a << "\t "  
-          << std::setw(10) << b << "\t " 
-          << std::setw(10) << m_curr << "\t "  
-          << fm << 
-          std::endl;
-
-
-
-        if (std::abs(m_curr - m_prev) < tol)      // check stopping condition
+        if (std::abs(m_curr - m_prev) < tol)
             break;
 
-
-        
-        if (f(a) * fm < 0)   // update interval 
-            b = m_curr;     
+        if (f(a) * fm < 0)
+            b = m_curr;
         else
-            a = m_curr;     
+            a = m_curr;
 
-
-
-        // update previous midpoint
         m_prev = m_curr;
-
-        
         iter++;
     }
 
-  
     return m_curr;
+    
+} 
+
+// Newton-Raphson Method
+NewtonRaphson::NewtonRaphson(double tolerance) : RootFinder(tolerance) {
+
+}
+
+double NewtonRaphson::df(double x) {
+    return 12*x*x - 3;   // Derivative of f(x)
+}
+
+double NewtonRaphson::solve() {
+    double x0 = 0.5; // Initial guess
+    double x1 = 0;
+    int iter = 1;
+
+    while (true) {
+        x1 = x0 - f(x0) / df(x0);
+        
+        std::cout << iter << "\t"
+                  << x0 << "\t"
+                  << x1 << std::endl;
+
+        if (std::abs(x1 - x0) < tol)
+        break;
+    
+        x0 = x1;
+        iter++;
+    }
+    return x1;
+}
+
+//Fixed Point Iteration Method
+FixedPoint::FixedPoint(double tolerance) : RootFinder(tolerance) {}
+
+double FixedPoint::g(double x)
+{
+    return cbrt((3 * x) / 4);  // rearranged equation
+}
+
+// Solve method 
+double FixedPoint::solve()
+{
+    double x0 = 0.5;
+    double x1;
+    int iter = 1;
+
+    while (true)
+    {
+        x1 = g(x0);
+
+        std::cout << iter << "\t"
+                  << x0 << "\t"
+                  << x1 << std::endl;
+
+        if (std::abs(x1 - x0) < tol)
+            break;
+
+        x0 = x1;
+        iter++;
+    }
+
+    return x1;
 }
