@@ -3,7 +3,7 @@
 
 int main()
 {
-    RootFinder* solver;
+    RootFinder* solver;    //Pointer Declaration
 
     std::cout << "1. Bisection\n";
     std::cout << "2. Newton Raphson\n";
@@ -20,11 +20,11 @@ int main()
     else
         solver = new FixedPoint();
 
-    double root = solver->solve();
+    double root = solver->solve();   //Finding root using chosen method
 
     std::cout << "\nApproximate Root = " << root << std::endl;
 
-    delete solver;
+    delete solver;   //Deleting object
 
     return 0;
 }

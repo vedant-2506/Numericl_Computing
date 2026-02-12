@@ -1,8 +1,6 @@
 #ifndef ROOT_HPP
 #define ROOT_HPP
 
-#include <iostream>
-
 //base class
 class RootFinder{
 protected:
@@ -10,14 +8,14 @@ protected:
 
 public:
     RootFinder(double tolerance = 0.0001);
-    virtual ~RootFinder() = default;
+    virtual ~RootFinder() = default;    //initialize virtual destructor
 
     virtual double f(double x);   //equation f(x)
 
-    virtual double solve() = 0;    //method to find root
+    virtual double solve() = 0;    //method to find root pure virtual function
 };
 
-//Bisection Methode
+//1) Bisection Method
 class Bisection : public RootFinder{
 private:
     double a,b;
@@ -27,7 +25,7 @@ public:
     double solve() override;  //override solve method
 };
 
-// Newton-Raphson Method
+// 2)Newton-Raphson Method
 class NewtonRaphson : public RootFinder{
 private:
     double df(double x); // derivative of f(x)
@@ -36,7 +34,7 @@ public:
     double solve() override;  //override solve method
 };
 
-//Fixed Point Iteration Method
+//3)Fixed Point Iteration Method
 class FixedPoint : public RootFinder{
 private:
     double g(double x);   // function g(x) for fixed point iteration
