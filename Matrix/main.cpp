@@ -1,60 +1,94 @@
-#include "./Src/Gaussian.hpp"   
+#include "Include/Gaussian.hpp"
+#include <fstream>
 #include <iostream>
+#include <filesystem>
+
 using namespace std;
+namespace fs = std::filesystem;
 
 int main()
 {
     try
     {
-        int r, c;
+        // Create output folder if not exists
+        fs::create_directory("output");
 
-        // first matrix
-        cout << "Enter rows and columns for First Matrix: ";
-        cin >> r >> c;
+        string fileA, fileB;
 
-        Matrix M1(r, c);
-        M1.inputData();
+        cout << "Enter first input file (Augmented matrix for Gaussian): ";
+        cin >> fileA;
 
-        cout << "\nFirst Matrix:\n";
-        M1.printData();
+        cout << "Enter second input file (for Addition/Subtraction): ";
+        cin >> fileB;
 
-        // second matrix
-        cout << "\nEnter rows and columns for Second Matrix: ";
-        cin >> r >> c;
+        ifstream finA(fileA);
+        ifstream finB(fileB);
 
-        Matrix M2(r, c);
-        M2.inputData();
+        if (!finA || !finB)
+            throw runtime_error("File opening error.");
 
-        cout << "\nSecond Matrix:\n";
-        M2.printData();
+        int r1, c1, r2, c2;
 
-        // Addition
-        Matrix Sum = M1.addMatrix(M2);
-        cout << "\nAddition Result:\n";
-        Sum.printData();
+        // Reading Matrix A
+        finA >> r1 >> c1;
+        Matrix A(r1, c1);
+        A.readFromFile(finA);
 
-        // Subtraction
-        Matrix Diff = M1.subMatrix(M2);
-        cout << "\nSubtraction Result:\n";
-        Diff.printData();
+        // Reading Matrix B
+        finB >> r2 >> c2;
+        Matrix B(r2, c2);
+        B.readFromFile(finB);
 
-        // Gaussian Elimination
-        cout << "\nGaussian Elimination \n";
-        cout << "Enter number of equations: ";
-        cin >> r;
+        finA.close();
+        finB.close();
 
-        Matrix G(r, r + 1);
+        // ============================
+        // ADDITION & SUBTRACTION
+        // ============================
 
-        cout << "Enter augmented matrix values:\n";
-        G.inputData();
+        if (r1 == r2 && c1 == c2)
+        {
+            Matrix C = A.add(B);
+            Matrix D = A.subtract(B);
 
-        cout << "\nAugmented Matrix:\n";
-        G.printData();
+            ofstream addOut("output/addition_output.txt");
+            C.displayToFile(addOut);
+            addOut.close();
 
-        G.performGaussian();   // Now performs full RREF
-        G.solveBack();         // Extract solution
+            ofstream subOut("output/subtraction_output.txt");
+            D.displayToFile(subOut);
+            subOut.close();
+        }
+        else
+        {
+            cout << "Addition/Subtraction not possible (size mismatch)\n";
+        }
+
+        // ============================
+        // GAUSSIAN ELIMINATION
+        // ============================
+
+        // Only perform Gaussian elimination if matrix A is augmented (n x n+1)
+        if (c1 == r1 + 1)
+        {
+            ofstream gaussMatrixOut("output/gaussian_matrix_output.txt");
+            ofstream gaussSolOut("output/gaussian_solution_output.txt");
+
+            A.gaussianEliminationWithPivoting(gaussMatrixOut, gaussSolOut);
+
+            gaussMatrixOut.close();
+            gaussSolOut.close();
+
+            cout << "Gaussian elimination completed.\n";
+        }
+        else
+        {
+            cout << "Skipping Gaussian elimination (not an augmented matrix).\n";
+        }
+
+        cout << "All output files saved inside 'output' folder.\n";
     }
-    catch(const exception &e)
+    catch (exception &e)
     {
         cout << "Error: " << e.what() << endl;
     }
