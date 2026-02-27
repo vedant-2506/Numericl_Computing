@@ -1,28 +1,19 @@
 #include "../Include/Gaussian.hpp"
-#include <cmath>
-#include <stdexcept>
-#include <algorithm>
 
-// Default Constructor
-Matrix::Matrix()
+using namespace std;
+
+// Default constructor
+Matrix::Matrix() : rows(0), cols(0) {}
+
+// Parameterized constructor
+Matrix::Matrix(int r, int c)
 {
-    rows = 0;
-    cols = 0;
+    rows = r;
+    cols = c;
+    mat.resize(rows, vector<double>(cols));
 }
 
-// Parameterized Constructor
-Matrix::Matrix(int rows, int cols)
-{
-    if (rows <= 0 || cols <= 0)
-        throw invalid_argument("Matrix size must be positive.");
-
-    this->rows = rows;
-    this->cols = cols;
-
-    mat.resize(rows, vector<double>(cols, 0));
-}
-
-// Copy Constructor
+// Copy constructor
 Matrix::Matrix(const Matrix &m)
 {
     rows = m.rows;
@@ -38,7 +29,7 @@ void Matrix::readFromFile(ifstream &fin)
             fin >> mat[i][j];
 }
 
-// Write matrix to file
+// Display matrix to file
 void Matrix::displayToFile(ofstream &fout) const
 {
     for (int i = 0; i < rows; i++)
@@ -49,62 +40,93 @@ void Matrix::displayToFile(ofstream &fout) const
     }
 }
 
-// Matrix Addition
-Matrix Matrix::add(const Matrix &m) const
+// Addition
+Matrix Matrix::add(const Matrix &other) const
 {
-    if (rows != m.rows || cols != m.cols)
-        throw logic_error("Addition not possible (size mismatch)");
+    if (rows != other.rows || cols != other.cols)
+        throw runtime_error("Dimension mismatch for addition");
 
     Matrix result(rows, cols);
 
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
-            result.mat[i][j] = mat[i][j] + m.mat[i][j];
+            result.mat[i][j] = mat[i][j] + other.mat[i][j];
 
     return result;
 }
 
-// Matrix Subtraction
-Matrix Matrix::subtract(const Matrix &m) const
+// subtraction
+Matrix Matrix::subtract(const Matrix &other) const
 {
-    if (rows != m.rows || cols != m.cols)
-        throw logic_error("Subtraction not possible (size mismatch)");
+    if (rows != other.rows || cols != other.cols)
+        throw runtime_error("Dimension mismatch for subtraction");
 
     Matrix result(rows, cols);
 
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
-            result.mat[i][j] = mat[i][j] - m.mat[i][j];
+            result.mat[i][j] = mat[i][j] - other.mat[i][j];
 
     return result;
 }
 
-// Gaussian Elimination with Partial Pivoting
+// Generate augmented matrix file from left and right matrices
+void Matrix::generateAugmentedMatrixFile(const string &leftFile,
+                                         const string &rightFile,
+                                         const string &outputFile)
+{
+    ifstream finL(leftFile);
+    ifstream finR(rightFile);
+    ofstream fout(outputFile);
+
+    if (!finL || !finR || !fout)
+        throw runtime_error("Error opening input files");
+
+    int rL, cL, rR, cR;
+
+    finL >> rL >> cL;
+    finR >> rR >> cR;
+
+    if (rL != rR || cR != 1)
+        throw runtime_error("Dimension mismatch");
+
+    fout << rL << " " << cL + 1 << endl;
+
+    for (int i = 0; i < rL; i++)
+    {
+        for (int j = 0; j < cL; j++)
+        {
+            double val;
+            finL >> val;
+            fout << val << " ";
+        }
+
+        double rhs;
+        finR >> rhs;
+        fout << rhs << endl;
+    }
+}
+
+// Gaussian elimination with pivoting
 void Matrix::gaussianEliminationWithPivoting(ofstream &matrixOut,
-                                            ofstream &solutionOut)
+                                             ofstream &vectorOut)
 {
-    const double EPS = 1e-12;
+    matrixOut << "Augmented Matrix:\n";
+    displayToFile(matrixOut);
 
     if (cols != rows + 1)
-        throw logic_error("Matrix must be augmented (n x n+1)");
+        throw logic_error("Matrix must be augmented");
 
-    // Forward Elimination with Partial Pivoting
     for (int k = 0; k < rows - 1; k++)
     {
         int maxRow = k;
-        double maxVal = fabs(mat[k][k]);
 
         for (int i = k + 1; i < rows; i++)
-        {
-            if (fabs(mat[i][k]) > maxVal)
-            {
-                maxVal = fabs(mat[i][k]);
+            if (abs(mat[i][k]) > abs(mat[maxRow][k]))
                 maxRow = i;
-            }
-        }
 
-        if (maxVal < EPS)
-            throw runtime_error("Matrix is singular → No unique solution.");
+        if (mat[maxRow][k] == 0)
+            throw runtime_error("Singular matrix");
 
         if (maxRow != k)
             swap(mat[k], mat[maxRow]);
@@ -112,34 +134,31 @@ void Matrix::gaussianEliminationWithPivoting(ofstream &matrixOut,
         for (int i = k + 1; i < rows; i++)
         {
             double factor = mat[i][k] / mat[k][k];
-
             for (int j = k; j < cols; j++)
                 mat[i][j] -= factor * mat[k][j];
         }
     }
 
-    // Save final upper triangular matrix
-    matrixOut << "Upper Triangular Matrix:\n";
-    displayToFile(matrixOut);
-
-    // Back Substitution
     vector<double> x(rows);
 
     for (int i = rows - 1; i >= 0; i--)
     {
-        if (fabs(mat[i][i]) < EPS)
-            throw runtime_error("No unique solution.");
-
         x[i] = mat[i][cols - 1];
-
         for (int j = i + 1; j < rows; j++)
             x[i] -= mat[i][j] * x[j];
-
         x[i] /= mat[i][i];
     }
 
-    // Save solution in required format
-    solutionOut << "Solution Vector:\n";
+    vectorOut << "# X Y\n";
     for (int i = 0; i < rows; i++)
-        solutionOut << "x" << i + 1 << " = " << x[i] << endl;
+        vectorOut << i + 1 << " " << x[i] << endl;
+
+    // Graph only for Gaussian
+    ofstream plot("plot.gnu");
+    plot << "set title 'X vs Y Solution Graph'\n";
+    plot << "set xlabel 'X (Index)'\n";
+    plot << "set ylabel 'Y (Solution Value)'\n";
+    plot << "set grid\n";
+    plot << "plot 'resultvector.txt' using 1:2 with linespoints title 'X vs Y'\n";
+    plot << "pause -1\n";
 }
