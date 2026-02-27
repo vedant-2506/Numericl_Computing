@@ -1,35 +1,37 @@
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef GAUSSIAN_HPP
+#define GAUSSIAN_HPP
 
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 #include <fstream>
+#include <cmath>
+#include <string>
 
 using namespace std;
 
-class Matrix
-{
-private:
-    int rows, cols;
-    vector<vector<double>> mat;
-
+class Matrix {
 public:
-    // Constructors
-    Matrix();
-    Matrix(int rows, int cols);
-    Matrix(const Matrix &m);
+    int rows, cols;                        
+    vector<vector<double>> mat;   
 
-    // File handling
-    void readFromFile(ifstream &fin);
-    void displayToFile(ofstream &fout) const;
+    Matrix();                    // Default constructor
+    Matrix(int r, int c);        // Parameterized constructor
+    Matrix(const Matrix &m);     // Copy constructor
 
-    // Matrix operations
-    Matrix add(const Matrix &m) const;
-    Matrix subtract(const Matrix &m) const;
+    void readFromFile(ifstream &fin);          
+    void displayToFile(ofstream &fout) const;  
 
-    // Gaussian elimination with Partial Pivoting
-    void gaussianEliminationWithPivoting(ofstream &matrixOut,
-                                         ofstream &solutionOut);
+    // Matrix Operations
+    Matrix add(const Matrix &other) const;         // Addition
+    Matrix subtract(const Matrix &other) const;    // Subtraction
+
+    void gaussianEliminationWithPivoting(ofstream &matrixOut, 
+                                         ofstream &vectorOut);    // Gaussian elimination with pivoting
+
+    static void generateAugmentedMatrixFile(const string &leftFile,
+                                            const string &rightFile,
+                                            const string &outputFile);   // Generate augmented matrix 
 };
 
 #endif
