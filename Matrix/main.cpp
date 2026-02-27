@@ -1,92 +1,100 @@
 #include "Include/Gaussian.hpp"
-#include <fstream>
-#include <iostream>
-#include <filesystem>
 
 using namespace std;
-namespace fs = std::filesystem;
 
 int main()
 {
     try
     {
-        // Create output folder if not exists
-        fs::create_directory("output");
+        int choice;
 
-        string fileA, fileB;
+        cout << "\n1. Matrix Addition\n";
+        cout << "2. Matrix Subtraction\n";
+        cout << "3. Gaussian Elimination\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-        cout << "Enter first input file (Augmented matrix for Gaussian): ";
-        cin >> fileA;
-
-        cout << "Enter second input file (for Addition/Subtraction): ";
-        cin >> fileB;
-
-        ifstream finA(fileA);
-        ifstream finB(fileB);
-
-        if (!finA || !finB)
-            throw runtime_error("File opening error.");
-
-        int r1, c1, r2, c2;
-
-        // Reading Matrix A
-        finA >> r1 >> c1;
-        Matrix A(r1, c1);
-        A.readFromFile(finA);
-
-        // Reading Matrix B
-        finB >> r2 >> c2;
-        Matrix B(r2, c2);
-        B.readFromFile(finB);
-
-        finA.close();
-        finB.close();
-
-        // ============================
-        // ADDITION & SUBTRACTION
-        // ============================
-
-        if (r1 == r2 && c1 == c2)
+        // ADDITION OR SUBTRACTION
+        if (choice == 1 || choice == 2)
         {
-            Matrix C = A.add(B);
-            Matrix D = A.subtract(B);
+            string file1, file2;
 
-            ofstream addOut("output/addition_output.txt");
-            C.displayToFile(addOut);
-            addOut.close();
+            cout << "Enter first matrix file: ";
+            cin >> file1;
 
-            ofstream subOut("output/subtraction_output.txt");
-            D.displayToFile(subOut);
-            subOut.close();
-        }
-        else
-        {
-            cout << "Addition/Subtraction not possible (size mismatch)\n";
+            cout << "Enter second matrix file: ";
+            cin >> file2;
+
+            ifstream fin1(file1);
+            ifstream fin2(file2);
+
+            int r1, c1, r2, c2;
+
+            fin1 >> r1 >> c1;
+            fin2 >> r2 >> c2;
+
+            if (r1 != r2 || c1 != c2)
+                throw runtime_error("Matrix dimensions must match");
+
+            Matrix A(r1, c1);
+            Matrix B(r2, c2);
+
+            A.readFromFile(fin1);
+            B.readFromFile(fin2);
+
+            Matrix result;
+
+            if (choice == 1)
+                result = A.add(B);
+            else
+                result = A.subtract(B);
+
+            ofstream fout("result.txt");
+            fout << r1 << " " << c1 << endl;
+            result.displayToFile(fout);
+
+            cout << "\nResult saved in result.txt\n";
         }
 
-        // ============================
         // GAUSSIAN ELIMINATION
-        // ============================
-
-        // Only perform Gaussian elimination if matrix A is augmented (n x n+1)
-        if (c1 == r1 + 1)
+        else if (choice == 3)
         {
-            ofstream gaussMatrixOut("output/gaussian_matrix_output.txt");
-            ofstream gaussSolOut("output/gaussian_solution_output.txt");
+            string leftFile, rightFile, augFile;
 
-            A.gaussianEliminationWithPivoting(gaussMatrixOut, gaussSolOut);
+            cout << "Enter left matrix file: ";
+            cin >> leftFile;
 
-            gaussMatrixOut.close();
-            gaussSolOut.close();
+            cout << "Enter right matrix file: ";
+            cin >> rightFile;
 
-            cout << "Gaussian elimination completed.\n";
+            cout << "Enter output augmented file: ";
+            cin >> augFile;
+
+            Matrix::generateAugmentedMatrixFile(leftFile, rightFile, augFile);
+
+            ifstream fin(augFile);
+
+            int r, c;
+            fin >> r >> c;
+
+            Matrix A(r, c);
+            A.readFromFile(fin);
+            fin.close();
+
+            ofstream matrixOut("resultmatrix.txt");
+            ofstream vectorOut("resultvector.txt");
+
+            A.gaussianEliminationWithPivoting(matrixOut, vectorOut);
+
+            cout << "\nMatrix saved in resultmatrix.txt\n";
+            cout << "Vector saved in resultvector.txt\n";
+            cout << "Run: gnuplot plot.gnu\n";
         }
+
         else
         {
-            cout << "Skipping Gaussian elimination (not an augmented matrix).\n";
+            cout << "Invalid choice\n";
         }
-
-        cout << "All output files saved inside 'output' folder.\n";
     }
     catch (exception &e)
     {
