@@ -1,38 +1,30 @@
-#ifndef BASIC_OPERATION_HPP
-#define BASIC_OPERATION_HPP
+#ifndef BASIC_OPERATION_HPP // prevent multiple include
+#define BASIC_OPERATION_HPP // start header guard
 
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <stdexcept>
-#include <cmath>
+#include "Matrix.hpp" // include base matrix class
+#include <cmath> // math functions
 
-using namespace std;
-
-class BasicOperation
+class BasicOperation : public Matrix // inherit Matrix class
 {
-private:
-    int rows, cols;                         // store matrix dimensions
-    vector<vector<double>> mat;            // 2D vector to store matrix data
+public: // public members
 
-public:
-    BasicOperation();                       // default constructor
-    BasicOperation(int r, int c);           // parameterized constructor
+    BasicOperation(); // default constructor
 
-    void readFromFile(ifstream &fin);       // read matrix from file
-    void displayToFile(ofstream &fout) const; // display matrix to file
+    BasicOperation(int r, int c); // parameter constructor
 
-    // Basic Matrix Operations
-    BasicOperation add(const BasicOperation &other) const;      // addition
-    BasicOperation subtract(const BasicOperation &other) const; // subtraction
-    BasicOperation multiply(const BasicOperation &other) const; // multiplication
-    BasicOperation scalarDivide(double value) const;            // scalar division
-    BasicOperation transpose() const;                           // transpose
-    double determinant() const;                                 // determinant
+    BasicOperation add(const BasicOperation &other) const; // matrix addition
 
-    int getRows() const;   // getter
-    int getCols() const;   // getter
-    vector<vector<double>> getMatrix() const; // getter
+    BasicOperation subtract(const BasicOperation &other) const; // matrix subtraction
+
+    BasicOperation multiply(const BasicOperation &other) const; // matrix multiplication
+
+    BasicOperation scalarDivide(double value) const; // divide by scalar
+
+    BasicOperation transpose() const; // transpose matrix
+
+    double determinant() const; // calculate determinant
+
+    void displayToFile(ofstream &fout) const; // write matrix to file
 };
 
-#endif
+#endif // end header guard
