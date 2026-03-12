@@ -1,20 +1,32 @@
-#ifndef LU_DECOMPOSITION_HPP // prevent multiple include
-#define LU_DECOMPOSITION_HPP // start header guard
+#ifndef LU_DECOMPOSITION_HPP             // prevent multiple inclusion
+#define LU_DECOMPOSITION_HPP             // define header guard
 
-#include "LinearOperation.hpp" // include linear operation class
-#include <string> // string library
+#include "LinearOperation.hpp"           // include LinearOperation
+#include <string>                        // for std::string
+#include <iostream>                      // for std::ostream
 
-using namespace std; // use standard namespace
-
-class LUDecomposition : public LinearOperation // inherit LinearOperation
+class LUDecomposition : public LinearOperation  // inherits LinearOperation -> Matrix
 {
-public: // public members
+public:                                  // accessible by everyone
 
-    static void doolittleLU(const string &Afile, const string &bfile); // doolittle method
+    // constructors
+    LUDecomposition();                   // default constructor
+    LUDecomposition(int r, int c);       // parameterized constructor
 
-    static void croutLU(const string &Afile, const string &bfile); // crout method
+    static void doolittleLU(             // Doolittle: L diagonal = 1
+        const std::string &Afile,        // coefficient matrix file
+        const std::string &bfile);       // constant vector file
 
-    static void choleskyDecomposition(const string &Afile, const string &bfile); // cholesky method
+    static void croutLU(                 // Crout: U diagonal = 1
+        const std::string &Afile,        // coefficient matrix file
+        const std::string &bfile);       // constant vector file
+
+    static void choleskyDecomposition(   // Cholesky: A = L * L^T
+        const std::string &Afile,        // coefficient matrix file
+        const std::string &bfile);       // constant vector file
+
+    // friend stream operator
+    friend std::ostream& operator<<(std::ostream &out, const LUDecomposition &lu);
 };
 
-#endif // end header guard
+#endif                                   // end header guard

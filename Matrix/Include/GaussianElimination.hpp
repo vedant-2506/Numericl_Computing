@@ -1,19 +1,31 @@
-#ifndef GAUSSIAN_ELIMINATION_HPP // prevent multiple include
-#define GAUSSIAN_ELIMINATION_HPP // start header guard
+#ifndef GAUSSIAN_ELIMINATION_HPP                      // prevent multiple inclusion
+#define GAUSSIAN_ELIMINATION_HPP                      // define header guard
 
-#include "LinearOperation.hpp" // include linear operation class
-#include <string> // string support
+#include "LinearOperation.hpp"                        // include parent class
+#include <fstream>                                    // for std::ofstream
 
-using namespace std; // use standard namespace
-
-class GaussianElimination : public LinearOperation // inherit LinearOperation
+class GaussianElimination : public LinearOperation    // inherits LinearOperation -> Matrix
 {
-public: // public members
+public:                                               // accessible by everyone
 
-    static void gaussianEliminationWithPivoting( // gaussian elimination method
-        Matrix &matrix, // augmented matrix input
-        ofstream &matrixOut, // output matrix file
-        ofstream &vectorOut); // output solution vector file
+    // constructors
+    GaussianElimination();                            // default constructor
+    GaussianElimination(int r, int c);                // parameterized constructor
+
+    // friend stream operator
+    friend std::ostream& operator<<(std::ostream &out, const GaussianElimination &ge);
+
+    // Gaussian WITH partial pivoting  (menu choice 7)
+    static void gaussianWithPivoting(
+        Matrix &matrix,                               // augmented matrix [A|b]
+        std::ofstream &matrixOut,                     // upper triangular output file
+        std::ofstream &vectorOut);                    // solution vector output file
+
+    // Gaussian WITHOUT pivoting  (menu choice 8)
+    static void gaussianWithoutPivoting(
+        Matrix &matrix,                               // augmented matrix [A|b]
+        std::ofstream &matrixOut,                     // upper triangular output file
+        std::ofstream &vectorOut);                    // solution vector output file
 };
 
-#endif // end header guard
+#endif                                                // end header guard

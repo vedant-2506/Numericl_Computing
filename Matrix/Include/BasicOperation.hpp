@@ -1,30 +1,30 @@
-#ifndef BASIC_OPERATION_HPP // prevent multiple include
-#define BASIC_OPERATION_HPP // start header guard
+#ifndef BASIC_OPERATION_HPP              // prevent multiple inclusion
+#define BASIC_OPERATION_HPP              // define header guard
 
-#include "Matrix.hpp" // include base matrix class
-#include <cmath> // math functions
+#include "Matrix.hpp"                    // include base Matrix class
+#include <iostream>                      // for std::ostream
 
-class BasicOperation : public Matrix // inherit Matrix class
+class BasicOperation : public Matrix     // inherits all Matrix methods and operators
 {
-public: // public members
+public:                                  // accessible by everyone
 
-    BasicOperation(); // default constructor
+    // constructors
+    BasicOperation();                    // default constructor
+    BasicOperation(int r, int c);        // parameterized constructor
 
-    BasicOperation(int r, int c); // parameter constructor
+    // named operation methods
+    BasicOperation add(const BasicOperation &o)      const; // named addition
+    BasicOperation subtract(const BasicOperation &o) const; // named subtraction
+    BasicOperation multiply(const BasicOperation &o) const; // named multiplication
+    BasicOperation scalarDivide(double v)            const; // divide all by scalar
+    BasicOperation scalarMultiply(double v)          const; // multiply all by scalar
 
-    BasicOperation add(const BasicOperation &other) const; // matrix addition
+    // basic operation specific methods
+    BasicOperation transpose()   const;  // transpose -> returns BasicOperation
+    double         determinant() const;  // determinant -> returns double
 
-    BasicOperation subtract(const BasicOperation &other) const; // matrix subtraction
-
-    BasicOperation multiply(const BasicOperation &other) const; // matrix multiplication
-
-    BasicOperation scalarDivide(double value) const; // divide by scalar
-
-    BasicOperation transpose() const; // transpose matrix
-
-    double determinant() const; // calculate determinant
-
-    void displayToFile(ofstream &fout) const; // write matrix to file
+    // friend stream operator
+    friend std::ostream& operator<<(std::ostream &out, const BasicOperation &b);
 };
 
-#endif // end header guard
+#endif                                   // end header guard
