@@ -1,126 +1,109 @@
-#include "../Include/BasicOperation.hpp"
-using namespace std;
+#include "../Include/BasicOperation.hpp" // MUST include own header, not Matrix.hpp directly
+#include <stdexcept>                     // for runtime_error
+#include <cmath>                         // for abs(), pow()
+using namespace std;                     // use standard namespace
 
-// default constructor
-BasicOperation::BasicOperation():Matrix(){}
+// ---- CONSTRUCTORS ----
+BasicOperation::BasicOperation() : Matrix() {}                  // default constructor
+BasicOperation::BasicOperation(int r, int c) : Matrix(r, c) {} // parameterized constructor
 
-// parameterized constructor
-BasicOperation::BasicOperation(int r,int c):Matrix(r,c){}
-
-// matrix addition
-BasicOperation BasicOperation::add(const BasicOperation &other) const
+// ---- ADD ----
+BasicOperation BasicOperation::add(const BasicOperation &o) const
 {
-    if(rows!=other.rows || cols!=other.cols) // check dimension
-        throw runtime_error("Dimension mismatch");
-
-    BasicOperation result(rows,cols); // create result matrix
-
-    for(int i=0;i<rows;i++) // loop rows
-        for(int j=0;j<cols;j++) // loop columns
-            result.data[i][j]=data[i][j]+other.data[i][j]; // add elements
-
-    return result; // return result
+    Matrix res = static_cast<const Matrix&>(*this) + static_cast<const Matrix&>(o); // operator+
+    BasicOperation r(res.getRows(), res.getCols());              // create result
+    for (int i = 0; i < res.getRows(); i++)                      // loop rows
+        for (int j = 0; j < res.getCols(); j++)                  // loop columns
+            r.set(i, j, res.get(i, j));                         // copy element
+    return r;                                                    // return result
 }
 
-// matrix subtraction
-BasicOperation BasicOperation::subtract(const BasicOperation &other) const
+// ---- SUBTRACT ----
+BasicOperation BasicOperation::subtract(const BasicOperation &o) const
 {
-    if(rows!=other.rows || cols!=other.cols)
-        throw runtime_error("Dimension mismatch");
-
-    BasicOperation result(rows,cols);
-
-    for(int i=0;i<rows;i++)
-        for(int j=0;j<cols;j++)
-            result.data[i][j]=data[i][j]-other.data[i][j]; // subtract elements
-
-    return result;
+    Matrix res = static_cast<const Matrix&>(*this) - static_cast<const Matrix&>(o); // operator-
+    BasicOperation r(res.getRows(), res.getCols());              // create result
+    for (int i = 0; i < res.getRows(); i++)                      // loop rows
+        for (int j = 0; j < res.getCols(); j++)                  // loop columns
+            r.set(i, j, res.get(i, j));                         // copy element
+    return r;                                                    // return result
 }
 
-// matrix multiplication
-BasicOperation BasicOperation::multiply(const BasicOperation &other) const
+// ---- MULTIPLY ----
+BasicOperation BasicOperation::multiply(const BasicOperation &o) const
 {
-    if(cols!=other.rows)
-        throw runtime_error("Invalid multiplication");
-
-    BasicOperation result(rows,other.cols);
-
-    for(int i=0;i<rows;i++)
-        for(int j=0;j<other.cols;j++)
-            for(int k=0;k<cols;k++)
-                result.data[i][j]+=data[i][k]*other.data[k][j]; // multiplication logic
-
-    return result;
+    Matrix res = static_cast<const Matrix&>(*this) * static_cast<const Matrix&>(o); // operator*
+    BasicOperation r(res.getRows(), res.getCols());              // create result
+    for (int i = 0; i < res.getRows(); i++)                      // loop rows
+        for (int j = 0; j < res.getCols(); j++)                  // loop columns
+            r.set(i, j, res.get(i, j));                         // copy element
+    return r;                                                    // return result
 }
 
-// scalar division
-BasicOperation BasicOperation::scalarDivide(double value) const
+// ---- SCALAR DIVIDE ----
+BasicOperation BasicOperation::scalarDivide(double v) const
 {
-    BasicOperation result(rows,cols);
-
-    for(int i=0;i<rows;i++)
-        for(int j=0;j<cols;j++)
-            result.data[i][j]=data[i][j]/value; // divide each element
-
-    return result;
+    if (abs(v) < 1e-9)                                           // check zero
+        throw runtime_error("scalarDivide: division by zero");
+    BasicOperation r(rows, cols);                                // result matrix
+    for (int i = 0; i < rows; i++)                               // loop rows
+        for (int j = 0; j < cols; j++)                          // loop columns
+            r.set(i, j, data[i][j] / v);                       // divide element
+    return r;                                                    // return result
 }
 
-// transpose matrix
+// ---- SCALAR MULTIPLY ----
+BasicOperation BasicOperation::scalarMultiply(double v) const
+{
+    BasicOperation r(rows, cols);                                // result matrix
+    for (int i = 0; i < rows; i++)                               // loop rows
+        for (int j = 0; j < cols; j++)                          // loop columns
+            r.set(i, j, data[i][j] * v);                       // multiply element
+    return r;                                                    // return result
+}
+
+// ---- TRANSPOSE ----
 BasicOperation BasicOperation::transpose() const
 {
-    BasicOperation result(cols,rows);
-
-    for(int i=0;i<rows;i++)
-        for(int j=0;j<cols;j++)
-            result.data[j][i]=data[i][j]; // swap rows and columns
-
-    return result;
+    BasicOperation r(cols, rows);                                // swapped dimensions
+    for (int i = 0; i < rows; i++)                               // loop rows
+        for (int j = 0; j < cols; j++)                          // loop columns
+            r.set(j, i, data[i][j]);                            // swap position
+    return r;                                                    // return result
 }
 
-// determinant using recursive expansion
+// ---- DETERMINANT ----
 double BasicOperation::determinant() const
 {
-    if(rows!=cols)
-        throw runtime_error("Not square matrix");
-
-    if(rows==1)
-        return data[0][0];
-
-    if(rows==2)
-        return data[0][0]*data[1][1]-data[0][1]*data[1][0];
-
-    double det=0;
-
-    for(int p=0;p<cols;p++)
+    if (rows != cols)                                            // must be square
+        throw runtime_error("determinant: not square");
+    if (rows == 1) return data[0][0];                            // 1x1 base case
+    if (rows == 2)                                               // 2x2 formula
+        return data[0][0]*data[1][1] - data[0][1]*data[1][0];
+    double det = 0;                                              // result
+    for (int p = 0; p < cols; p++)                               // expand along row 0
     {
-        BasicOperation sub(rows-1,cols-1);
-
-        for(int i=1;i<rows;i++)
+        BasicOperation sub(rows-1, cols-1);                      // submatrix
+        for (int i = 1; i < rows; i++)                           // loop rows (skip 0)
         {
-            int colIndex=0;
-
-            for(int j=0;j<cols;j++)
-            {
-                if(j==p) continue;
-
-                sub.data[i-1][colIndex]=data[i][j];
-                colIndex++;
-            }
+            int c = 0;                                           // sub column index
+            for (int j = 0; j < cols; j++)                      // loop all columns
+                if (j != p) { sub.set(i-1, c, data[i][j]); c++; } // skip col p
         }
-
-        det+=pow(-1,p)*data[0][p]*sub.determinant();
+        det += pow(-1.0, p) * data[0][p] * sub.determinant();   // cofactor term
     }
-
-    return det;
+    return det;                                                  // return result
 }
 
-// write matrix to file
-void BasicOperation::displayToFile(ofstream &fout) const
+// ---- FRIEND OPERATOR<< ----
+ostream& operator<<(ostream &out, const BasicOperation &b)
 {
-    for(int i=0;i<rows;i++)
+    out << "BasicOperation(" << b.rows << "x" << b.cols << "):\n"; // header line
+    for (int i = 0; i < b.rows; i++)                             // loop rows
     {
-        for(int j=0;j<cols;j++)
-            fout<<data[i][j]<<" ";
-        fout<<endl;
+        for (int j = 0; j < b.cols; j++)                        // loop columns
+            out << b.data[i][j] << "\t";                        // print element
+        out << "\n";                                             // newline
     }
+    return out;                                                  // return stream
 }

@@ -1,67 +1,132 @@
-#include "../Include/GaussianElimination.hpp"
-#include <cstdlib>
-using namespace std;
+#include "../Include/GaussianElimination.hpp"         // include header
+#include "../Include/PlotHelper.hpp"                   // include plot helper
+#include <vector>                                      // for vector
+#include <cmath>                                       // for abs()
+#include <stdexcept>                                   // for runtime_error
+using namespace std;                                   // use standard namespace
 
-void GaussianElimination::gaussianEliminationWithPivoting(
-    Matrix &matrix,
-    ofstream &matrixOut,
-    ofstream &vectorOut)
+// ---- CONSTRUCTORS ----
+GaussianElimination::GaussianElimination() : LinearOperation() {}               // default
+GaussianElimination::GaussianElimination(int r, int c) : LinearOperation(r,c){} // parameterized
+
+// ---- FRIEND OPERATOR ----
+ostream& operator<<(ostream &out, const GaussianElimination &ge)
 {
-    int n=matrix.getRows(); // number of equations
-    auto &A=matrix.getData(); // reference matrix
+    out << "GaussianElimination object\n";             // label
+    return out;                                        // return stream
+}
 
-    // forward elimination
-    for(int k=0;k<n-1;k++)
+// ================================================================
+// GAUSSIAN WITH PARTIAL PIVOTING  (choice 7)
+// ================================================================
+void GaussianElimination::gaussianWithPivoting(
+    Matrix &matrix, ofstream &matrixOut, ofstream &vectorOut)
+{
+    int n   = matrix.getRows();                        // number of equations
+    auto &A = matrix.getData();                        // reference to matrix data
+
+    // ---- FORWARD ELIMINATION WITH PARTIAL PIVOTING ----
+    for (int k = 0; k < n-1; k++)                     // loop pivot columns
     {
-        int maxRow=k;
+        int mx = k;                                    // assume current row is max
+        for (int i = k+1; i < n; i++)                 // search below for larger pivot
+            if (abs(A[i][k]) > abs(A[mx][k])) mx = i; // update max row index
+        swap(A[k], A[mx]);                             // swap rows
 
-        for(int i=k+1;i<n;i++) // find pivot
-            if(abs(A[i][k])>abs(A[maxRow][k]))
-                maxRow=i;
+        if (abs(A[k][k]) < 1e-9)                      // check for zero pivot
+            throw runtime_error("Singular matrix: zero pivot");
 
-        swap(A[k],A[maxRow]); // swap rows
-
-        for(int i=k+1;i<n;i++)
+        for (int i = k+1; i < n; i++)                 // eliminate below pivot
         {
-            double factor=A[i][k]/A[k][k];
-
-            for(int j=k;j<n+1;j++)
-                A[i][j]-=factor*A[k][j]; // elimination
+            double f = A[i][k] / A[k][k];             // elimination factor
+            for (int j = k; j < n+1; j++)             // apply to entire row
+                A[i][j] -= f * A[k][j];               // row reduction
         }
     }
 
-    // save answer matrix
-    for(int i=0;i<n;i++)
+    // ---- SAVE UPPER TRIANGULAR MATRIX ----
+    matrixOut << n << " " << n+1 << endl;              // write dimensions
+    for (int i = 0; i < n; i++)                        // loop rows
     {
-        for(int j=0;j<n+1;j++)
-            matrixOut<<A[i][j]<<" ";
-        matrixOut<<endl;
+        for (int j = 0; j < n+1; j++)                 // loop columns
+            matrixOut << A[i][j] << " ";               // write element
+        matrixOut << endl;                             // newline
     }
 
-    vector<double> x(n); // solution vector
-
-    // back substitution
-    for(int i=n-1;i>=0;i--)
+    // ---- BACK SUBSTITUTION ----
+    vector<double> x(n);                               // solution vector
+    for (int i = n-1; i >= 0; i--)                    // loop backward
     {
-        x[i]=A[i][n];
-
-        for(int j=i+1;j<n;j++)
-            x[i]-=A[i][j]*x[j];
-
-        x[i]/=A[i][i];
+        x[i] = A[i][n];                                // start with b value
+        for (int j = i+1; j < n; j++)                 // subtract known values
+            x[i] -= A[i][j] * x[j];                   // accumulated sum
+        x[i] /= A[i][i];                               // divide by diagonal
     }
 
-    // save vector
-    ofstream plot("plot.dat");
+    // ---- SAVE SOLUTION VECTOR ----
+    vectorOut << n << " 1" << endl;                    // write dimensions
+    for (int i = 0; i < n; i++)                        // loop solution
+        vectorOut << x[i] << endl;                     // write each value
 
-    for(int i=0;i<n;i++)
+    // ---- PLOT ----
+    PlotHelper::saveAndPlot(x,
+        "Output/gaussian_pivot_plot.dat",
+        "Output/gaussian_pivot_plot.gnu",
+        "Output/gaussian_pivot_graph.png",
+        "Gaussian Elimination WITH Pivoting");
+}
+
+// ================================================================
+// GAUSSIAN WITHOUT PIVOTING  (choice 8)
+// ================================================================
+void GaussianElimination::gaussianWithoutPivoting(
+    Matrix &matrix, ofstream &matrixOut, ofstream &vectorOut)
+{
+    int n   = matrix.getRows();                        // number of equations
+    auto &A = matrix.getData();                        // reference to matrix data
+
+    // ---- FORWARD ELIMINATION (NO ROW SWAPPING) ----
+    for (int k = 0; k < n-1; k++)                     // loop pivot columns
     {
-        vectorOut<<x[i]<<endl;
-        plot<<i+1<<" "<<x[i]<<endl;
+        if (abs(A[k][k]) < 1e-9)                      // check for zero pivot
+            throw runtime_error("Zero pivot: try Gaussian WITH pivoting instead");
+
+        for (int i = k+1; i < n; i++)                 // eliminate below pivot
+        {
+            double f = A[i][k] / A[k][k];             // elimination factor
+            for (int j = k; j < n+1; j++)             // apply to entire row
+                A[i][j] -= f * A[k][j];               // row reduction
+        }
     }
 
-    plot.close();
+    // ---- SAVE UPPER TRIANGULAR MATRIX ----
+    matrixOut << n << " " << n+1 << endl;              // write dimensions
+    for (int i = 0; i < n; i++)                        // loop rows
+    {
+        for (int j = 0; j < n+1; j++)                 // loop columns
+            matrixOut << A[i][j] << " ";               // write element
+        matrixOut << endl;                             // newline
+    }
 
-    // generate graph using gnuplot
-    system("gnuplot -e \"plot 'plot.dat' with linespoints\"");
+    // ---- BACK SUBSTITUTION ----
+    vector<double> x(n);                               // solution vector
+    for (int i = n-1; i >= 0; i--)                    // loop backward
+    {
+        x[i] = A[i][n];                                // start with b value
+        for (int j = i+1; j < n; j++)                 // subtract known values
+            x[i] -= A[i][j] * x[j];                   // accumulated sum
+        x[i] /= A[i][i];                               // divide by diagonal
+    }
+
+    // ---- SAVE SOLUTION VECTOR ----
+    vectorOut << n << " 1" << endl;                    // write dimensions
+    for (int i = 0; i < n; i++)                        // loop solution
+        vectorOut << x[i] << endl;                     // write each value
+
+    // ---- PLOT ----
+    PlotHelper::saveAndPlot(x,
+        "Output/gaussian_nopivot_plot.dat",
+        "Output/gaussian_nopivot_plot.gnu",
+        "Output/gaussian_nopivot_graph.png",
+        "Gaussian Elimination WITHOUT Pivoting");
 }
