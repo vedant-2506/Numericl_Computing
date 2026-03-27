@@ -2,6 +2,14 @@
 #include <stdexcept>                       // for runtime_error
 using namespace std;                       // use standard namespace
 
+static string normalizeInputPath(const string &path)
+{
+    // Accept common typo: "Input49l.txt" -> "Input/49l.txt"
+    if (path.rfind("Input", 0) == 0 && path.size() > 5 && path[5] != '/')
+        return "Input/" + path.substr(5);
+    return path;
+}
+
 // ---- CONSTRUCTORS ----
 LinearOperation::LinearOperation() : Matrix() {}                // default constructor
 LinearOperation::LinearOperation(int r, int c) : Matrix(r,c){} // parameterized constructor
@@ -22,11 +30,16 @@ ostream& operator<<(ostream &out, const LinearOperation &lo)    // print to stre
 void LinearOperation::generateAugmentedMatrixFile(
     const string &leftFile, const string &rightFile, const string &outputFile)
 {
-    ifstream finL(leftFile);                // open matrix A file
-    ifstream finR(rightFile);              // open vector b file
+    string leftPath  = normalizeInputPath(leftFile);
+    string rightPath = normalizeInputPath(rightFile);
+
+    ifstream finL(leftPath);                // open matrix A file
+    ifstream finR(rightPath);               // open vector b file
     ofstream fout(outputFile);             // open output augmented file
     if (!finL || !finR || !fout)           // check all files opened
-        throw runtime_error("File error");
+        throw runtime_error("File error: cannot open A='" + leftPath +
+                            "', b='" + rightPath +
+                            "', out='" + outputFile + "'");
     int rL, cL, rR, cR;
     finL >> rL >> cL;                      // read A dimensions
     finR >> rR >> cR;                      // read b dimensions
