@@ -1,0 +1,37 @@
+Matrix Properties & Transforms
+==============================
+
+Input Matrix (4x4):
+10 7 8 7 
+7 5 6 5 
+8 6 10 9 
+7 5 9 10 
+
+--- Property Checks ---
+isSquare            : true
+isSymmetric         : true
+isIdentity          : false
+isNull              : false
+isDiagonal          : false
+isDiagonallyDominant: false
+
+isTranspose: skipped
+
+--- Transpose ---
+10 7 8 7 
+7 5 6 5 
+8 6 10 9 
+7 5 9 10 
+
+--- After makeDiagonallyDominant ---
+10 7 8 7 
+8 6 10 9 
+7 5 9 10 
+7 5 6 5 
+
+--- Inverse ---
+25 -41 10 -6 
+-41 68 -17 10 
+10 -17 5 -3 
+-6 10 -3 2 
+
