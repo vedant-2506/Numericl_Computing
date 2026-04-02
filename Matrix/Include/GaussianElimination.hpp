@@ -1,31 +1,27 @@
-#ifndef GAUSSIAN_ELIMINATION_HPP                      // prevent multiple inclusion
-#define GAUSSIAN_ELIMINATION_HPP                      // define header guard
+#ifndef GAUSSIAN_ELIMINATION_HPP                  // prevent multiple inclusion
+#define GAUSSIAN_ELIMINATION_HPP                  // define header guard
 
 #include "LinearOperation.hpp"                        // include parent class
 #include <fstream>                                    // for std::ofstream
 
-class GaussianElimination : public LinearOperation    // inherits LinearOperation -> Matrix
+class GaussianElimination : public LinearOperation  // declare class
 {
-public:                                               // accessible by everyone
+public:
 
-    // constructors
-    GaussianElimination();                            // default constructor
-    GaussianElimination(int r, int c);                // parameterized constructor
+    GaussianElimination();                        // call function or method
+    GaussianElimination(int r, int c);            // declare and initialize object
 
-    // friend stream operator
-    friend std::ostream& operator<<(std::ostream &out, const GaussianElimination &ge);
+    friend std::ostream& operator<<(std::ostream &out, const GaussianElimination &ge);  // declare function
 
-    // Gaussian WITH partial pivoting  (menu choice 7)
-    static void gaussianWithPivoting(
-        Matrix &matrix,                               // augmented matrix [A|b]
-        std::ofstream &matrixOut,                     // upper triangular output file
-        std::ofstream &vectorOut);                    // solution vector output file
+    void gaussianWithPivoting(                    // execute statement
+        Matrix &matrix,                           // execute statement
+        std::ofstream &matrixOut,                 // handle file stream operation
+        std::ofstream &vectorOut);                // handle file stream operation
 
-    // Gaussian WITHOUT pivoting  (menu choice 8)
-    static void gaussianWithoutPivoting(
-        Matrix &matrix,                               // augmented matrix [A|b]
-        std::ofstream &matrixOut,                     // upper triangular output file
-        std::ofstream &vectorOut);                    // solution vector output file
+    void gaussianWithoutPivoting(                 // execute statement
+        Matrix &matrix,                           // execute statement
+        std::ofstream &matrixOut,                 // handle file stream operation
+        std::ofstream &vectorOut);                // handle file stream operation
 };
 
-#endif                                                // end header guard
+#endif                                            // end header guard

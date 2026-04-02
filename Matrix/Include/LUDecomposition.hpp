@@ -1,32 +1,30 @@
-#ifndef LU_DECOMPOSITION_HPP             // prevent multiple inclusion
-#define LU_DECOMPOSITION_HPP             // define header guard
+#ifndef LU_DECOMPOSITION_HPP                      // prevent multiple inclusion
+#define LU_DECOMPOSITION_HPP                      // define header guard
 
 #include "LinearOperation.hpp"           // include LinearOperation
 #include <string>                        // for std::string
 #include <iostream>                      // for std::ostream
 
-class LUDecomposition : public LinearOperation  // inherits LinearOperation -> Matrix
-{
-public:                                  // accessible by everyone
+class LUDecomposition : public LinearOperation    // declare class
+{ 
+public:
 
-    // constructors
-    LUDecomposition();                   // default constructor
-    LUDecomposition(int r, int c);       // parameterized constructor
+    LUDecomposition();                            // call function or method
+    LUDecomposition(int r, int c);                // declare and initialize object
 
-    static void doolittleLU(             // Doolittle: L diagonal = 1
-        const std::string &Afile,        // coefficient matrix file
-        const std::string &bfile);       // constant vector file
+    void doolittleLU(                             // execute statement
+        const std::string &Afile,                 // declare variable
+        const std::string &bfile);                // declare variable
 
-    static void croutLU(                 // Crout: U diagonal = 1
-        const std::string &Afile,        // coefficient matrix file
-        const std::string &bfile);       // constant vector file
+    void croutLU(                                 // execute statement
+        const std::string &Afile,                 // declare variable
+        const std::string &bfile);                // declare variable
 
-    static void choleskyDecomposition(   // Cholesky: A = L * L^T
-        const std::string &Afile,        // coefficient matrix file
-        const std::string &bfile);       // constant vector file
+    void choleskyDecomposition(                   // execute statement
+        const std::string &Afile,                 // declare variable
+        const std::string &bfile);                // declare variable
 
-    // friend stream operator
-    friend std::ostream& operator<<(std::ostream &out, const LUDecomposition &lu);
+    friend std::ostream& operator<<(std::ostream &out, const LUDecomposition &lu);  // declare function
 };
 
-#endif                                   // end header guard
+#endif                                            // end header guard

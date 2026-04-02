@@ -1,30 +1,26 @@
-#ifndef BASIC_OPERATION_HPP              // prevent multiple inclusion
-#define BASIC_OPERATION_HPP              // define header guard
+#ifndef BASIC_OPERATION_HPP                       // prevent multiple inclusion
+#define BASIC_OPERATION_HPP                       // define header guard
 
 #include "Matrix.hpp"                    // include base Matrix class
 #include <iostream>                      // for std::ostream
 
-class BasicOperation : public Matrix     // inherits all Matrix methods and operators
+class BasicOperation : public Matrix              // declare class
 {
-public:                                  // accessible by everyone
+public:
 
-    // constructors
-    BasicOperation();                    // default constructor
-    BasicOperation(int r, int c);        // parameterized constructor
+    BasicOperation();                             // call function or method
+    BasicOperation(int r, int c);                 // declare and initialize object
 
-    // named operation methods
-    BasicOperation add(const BasicOperation &o)      const; // named addition
-    BasicOperation subtract(const BasicOperation &o) const; // named subtraction
-    BasicOperation multiply(const BasicOperation &o) const; // named multiplication
-    BasicOperation scalarDivide(double v)            const; // divide all by scalar
-    BasicOperation scalarMultiply(double v)          const; // multiply all by scalar
+    BasicOperation add(const BasicOperation &o)      const;  // call function or method
+    BasicOperation subtract(const BasicOperation &o) const;  // call function or method
+    BasicOperation multiply(const BasicOperation &o) const;  // call function or method
+    BasicOperation scalarDivide(double v)            const;  // declare and initialize object
+    BasicOperation scalarMultiply(double v)          const;  // declare and initialize object
 
-    // basic operation specific methods
-    BasicOperation transpose()   const;  // transpose -> returns BasicOperation
-    double         determinant() const;  // determinant -> returns double
+    BasicOperation transpose()   const;           // call function or method
+    double         determinant() const;           // declare and initialize object
 
-    // friend stream operator
-    friend std::ostream& operator<<(std::ostream &out, const BasicOperation &b);
+    friend std::ostream& operator<<(std::ostream &out, const BasicOperation &b);  // declare function
 };
 
-#endif                                   // end header guard
+#endif                                            // end header guard
