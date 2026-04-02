@@ -1,68 +1,63 @@
 #include "../Include/Matrix.hpp" // include Matrix header
 #include <stdexcept>             // for runtime_error
-using namespace std;             // use standard namespace
+using namespace std;                              // use standard namespace
 
-// ---- CONSTRUCTORS ----
-Matrix::Matrix() : rows(0), cols(0) {}                          // default: empty matrix
+Matrix::Matrix() : rows(0), cols(0) {}            // define function
 
-Matrix::Matrix(int r, int c) : rows(r), cols(c),                // parameterized constructor
-    data(r, vector<double>(c, 0.0)) {}                          // allocate r x c with zeros
+Matrix::Matrix(int r, int c) : rows(r), cols(c),  // define function
+    data(r, vector<double>(c, 0.0)) {}            // execute statement
 
-Matrix::Matrix(const Matrix &m) : rows(m.rows),                 // copy constructor
-    cols(m.cols), data(m.data) {}                               // deep copy all data
+Matrix::Matrix(const Matrix &m) : rows(m.rows),   // define function
+    cols(m.cols), data(m.data) {}                 // execute statement
 
-// ---- GETTERS AND SETTERS ----
-int    Matrix::getRows()  const { return rows; }                // return row count
-int    Matrix::getCols()  const { return cols; }                // return column count
-double Matrix::get(int i, int j) const { return data[i][j]; }  // get element at (i,j)
-void   Matrix::set(int i, int j, double v) { data[i][j] = v; } // set element at (i,j)
-vector<vector<double>>& Matrix::getData() { return data; }      // return data reference
+int    Matrix::getRows()  const { return rows; }  // define function
+int    Matrix::getCols()  const { return cols; }  // define function
+double Matrix::get(int i, int j) const { return data[i][j]; }  // define function
+void   Matrix::set(int i, int j, double v) { data[i][j] = v; }  // define function
+vector<vector<double>>& Matrix::getData() { return data; }  // define function
 
-// ---- ELEMENT ACCESS OPERATORS ----
-double& Matrix::operator()(int i, int j)       { return data[i][j]; } // read/write
-double  Matrix::operator()(int i, int j) const { return data[i][j]; } // read-only
+double& Matrix::operator()(int i, int j)       { return data[i][j]; }  // define function
+double  Matrix::operator()(int i, int j) const { return data[i][j]; }  // define function
 
-// ---- FILE I/O ----
-void Matrix::readFromFile(ifstream &fin)                        // read matrix from file
+void Matrix::readFromFile(ifstream &fin)          // handle file stream operation
 {
-    for (int i = 0; i < rows; i++)                              // loop rows
-        for (int j = 0; j < cols; j++)                         // loop columns
-            fin >> data[i][j];                                 // read element
+    for (int i = 0; i < rows; i++)                // iterate over elements
+        for (int j = 0; j < cols; j++)            // iterate over elements
+            fin >> data[i][j];                    // check equality or comparison
 }
 
-void Matrix::displayToFile(ofstream &fout) const                // write matrix to file
+void Matrix::displayToFile(ofstream &fout) const  // define function
 {
-    for (int i = 0; i < rows; i++)                              // loop rows
+    for (int i = 0; i < rows; i++)                // iterate over elements
     {
-        for (int j = 0; j < cols; j++) fout << data[i][j] << " "; // write element
-        fout << "\n";                                          // newline after row
+        for (int j = 0; j < cols; j++) fout << data[i][j] << " ";  // iterate over elements
+        fout << "\n";                             // check equality or comparison
     }
 }
 
-void Matrix::display() const                                    // print to console
+void Matrix::display() const                      // define function
 {
-    for (int i = 0; i < rows; i++)                              // loop rows
+    for (int i = 0; i < rows; i++)                // iterate over elements
     {
-        for (int j = 0; j < cols; j++) cout << data[i][j] << " "; // print element
-        cout << "\n";                                          // newline
+        for (int j = 0; j < cols; j++) cout << data[i][j] << " ";  // iterate over elements
+        cout << "\n";                             // check equality or comparison
     }
 }
 
-// ---- FRIEND STREAM OPERATORS (friend = can access protected data directly) ----
-istream& operator>>(istream &in, Matrix &m)                     // read from stream
+istream& operator>>(istream &in, Matrix &m)       // stream input/output operation
 {
-    for (int i = 0; i < m.rows; i++)                            // access protected rows
-        for (int j = 0; j < m.cols; j++)                       // access protected cols
-            in >> m.data[i][j];                                // access protected data
-    return in;                                                  // return stream
+    for (int i = 0; i < m.rows; i++)              // iterate over elements
+        for (int j = 0; j < m.cols; j++)          // iterate over elements
+            in >> m.data[i][j];                   // check equality or comparison
+    return in;                                    // return result from function
 }
 
-ostream& operator<<(ostream &out, const Matrix &m)              // write to stream
+ostream& operator<<(ostream &out, const Matrix &m)  // stream input/output operation
 {
-    for (int i = 0; i < m.rows; i++)                            // access protected rows
+    for (int i = 0; i < m.rows; i++)              // iterate over elements
     {
-        for (int j = 0; j < m.cols; j++) out << m.data[i][j] << " "; // access protected data
-        out << "\n";                                           // newline
+        for (int j = 0; j < m.cols; j++) out << m.data[i][j] << " ";  // iterate over elements
+        out << "\n";                              // check equality or comparison
     }
-    return out;                                                 // return stream
+    return out;                                   // return result from function
 }

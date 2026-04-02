@@ -1,109 +1,100 @@
 #include "../Include/BasicOperation.hpp" // MUST include own header, not Matrix.hpp directly
 #include <stdexcept>                     // for runtime_error
 #include <cmath>                         // for abs(), pow()
-using namespace std;                     // use standard namespace
+using namespace std;                              // use standard namespace
 
-// ---- CONSTRUCTORS ----
-BasicOperation::BasicOperation() : Matrix() {}                  // default constructor
-BasicOperation::BasicOperation(int r, int c) : Matrix(r, c) {} // parameterized constructor
+BasicOperation::BasicOperation() : Matrix() {}    // define function
+BasicOperation::BasicOperation(int r, int c) : Matrix(r, c) {}  // define function
 
-// ---- ADD ----
-BasicOperation BasicOperation::add(const BasicOperation &o) const
+BasicOperation BasicOperation::add(const BasicOperation &o) const  // define function
 {
-    Matrix res = static_cast<const Matrix&>(*this) + static_cast<const Matrix&>(o); // operator+
-    BasicOperation r(res.getRows(), res.getCols());              // create result
-    for (int i = 0; i < res.getRows(); i++)                      // loop rows
-        for (int j = 0; j < res.getCols(); j++)                  // loop columns
-            r.set(i, j, res.get(i, j));                         // copy element
-    return r;                                                    // return result
+    Matrix res = static_cast<const Matrix&>(*this) + static_cast<const Matrix&>(o);  // assign value to variable
+    BasicOperation r(res.getRows(), res.getCols());  // call function or method
+    for (int i = 0; i < res.getRows(); i++)       // iterate over elements
+        for (int j = 0; j < res.getCols(); j++)   // iterate over elements
+            r.set(i, j, res.get(i, j));           // call function or method
+    return r;                                     // return result from function
 }
 
-// ---- SUBTRACT ----
-BasicOperation BasicOperation::subtract(const BasicOperation &o) const
+BasicOperation BasicOperation::subtract(const BasicOperation &o) const  // define function
 {
-    Matrix res = static_cast<const Matrix&>(*this) - static_cast<const Matrix&>(o); // operator-
-    BasicOperation r(res.getRows(), res.getCols());              // create result
-    for (int i = 0; i < res.getRows(); i++)                      // loop rows
-        for (int j = 0; j < res.getCols(); j++)                  // loop columns
-            r.set(i, j, res.get(i, j));                         // copy element
-    return r;                                                    // return result
+    Matrix res = static_cast<const Matrix&>(*this) - static_cast<const Matrix&>(o);  // assign value to variable
+    BasicOperation r(res.getRows(), res.getCols());  // call function or method
+    for (int i = 0; i < res.getRows(); i++)       // iterate over elements
+        for (int j = 0; j < res.getCols(); j++)   // iterate over elements
+            r.set(i, j, res.get(i, j));           // call function or method
+    return r;                                     // return result from function
 }
 
-// ---- MULTIPLY ----
-BasicOperation BasicOperation::multiply(const BasicOperation &o) const
+BasicOperation BasicOperation::multiply(const BasicOperation &o) const  // define function
 {
-    Matrix res = static_cast<const Matrix&>(*this) * static_cast<const Matrix&>(o); // operator*
-    BasicOperation r(res.getRows(), res.getCols());              // create result
-    for (int i = 0; i < res.getRows(); i++)                      // loop rows
-        for (int j = 0; j < res.getCols(); j++)                  // loop columns
-            r.set(i, j, res.get(i, j));                         // copy element
-    return r;                                                    // return result
+    Matrix res = static_cast<const Matrix&>(*this) * static_cast<const Matrix&>(o);  // assign value to variable
+    BasicOperation r(res.getRows(), res.getCols());  // call function or method
+    for (int i = 0; i < res.getRows(); i++)       // iterate over elements
+        for (int j = 0; j < res.getCols(); j++)   // iterate over elements
+            r.set(i, j, res.get(i, j));           // call function or method
+    return r;                                     // return result from function
 }
 
-// ---- SCALAR DIVIDE ----
-BasicOperation BasicOperation::scalarDivide(double v) const
+BasicOperation BasicOperation::scalarDivide(double v) const  // define function
 {
-    if (abs(v) < 1e-9)                                           // check zero
-        throw runtime_error("scalarDivide: division by zero");
-    BasicOperation r(rows, cols);                                // result matrix
-    for (int i = 0; i < rows; i++)                               // loop rows
-        for (int j = 0; j < cols; j++)                          // loop columns
-            r.set(i, j, data[i][j] / v);                       // divide element
-    return r;                                                    // return result
+    if (abs(v) < 1e-9)                            // check condition
+        throw runtime_error("scalarDivide: division by zero");  // raise exception with error
+    BasicOperation r(rows, cols);                 // call function or method
+    for (int i = 0; i < rows; i++)                // iterate over elements
+        for (int j = 0; j < cols; j++)            // iterate over elements
+            r.set(i, j, data[i][j] / v);          // call function or method
+    return r;                                     // return result from function
 }
 
-// ---- SCALAR MULTIPLY ----
-BasicOperation BasicOperation::scalarMultiply(double v) const
+BasicOperation BasicOperation::scalarMultiply(double v) const  // define function
 {
-    BasicOperation r(rows, cols);                                // result matrix
-    for (int i = 0; i < rows; i++)                               // loop rows
-        for (int j = 0; j < cols; j++)                          // loop columns
-            r.set(i, j, data[i][j] * v);                       // multiply element
-    return r;                                                    // return result
+    BasicOperation r(rows, cols);                 // call function or method
+    for (int i = 0; i < rows; i++)                // iterate over elements
+        for (int j = 0; j < cols; j++)            // iterate over elements
+            r.set(i, j, data[i][j] * v);          // call function or method
+    return r;                                     // return result from function
 }
 
-// ---- TRANSPOSE ----
-BasicOperation BasicOperation::transpose() const
+BasicOperation BasicOperation::transpose() const  // define function
 {
-    BasicOperation r(cols, rows);                                // swapped dimensions
-    for (int i = 0; i < rows; i++)                               // loop rows
-        for (int j = 0; j < cols; j++)                          // loop columns
-            r.set(j, i, data[i][j]);                            // swap position
-    return r;                                                    // return result
+    BasicOperation r(cols, rows);                 // call function or method
+    for (int i = 0; i < rows; i++)                // iterate over elements
+        for (int j = 0; j < cols; j++)            // iterate over elements
+            r.set(j, i, data[i][j]);              // call function or method
+    return r;                                     // return result from function
 }
 
-// ---- DETERMINANT ----
-double BasicOperation::determinant() const
+double BasicOperation::determinant() const        // define function
 {
-    if (rows != cols)                                            // must be square
-        throw runtime_error("determinant: not square");
-    if (rows == 1) return data[0][0];                            // 1x1 base case
-    if (rows == 2)                                               // 2x2 formula
-        return data[0][0]*data[1][1] - data[0][1]*data[1][0];
-    double det = 0;                                              // result
-    for (int p = 0; p < cols; p++)                               // expand along row 0
+    if (rows != cols)                             // check condition
+        throw runtime_error("determinant: not square");  // raise exception with error
+    if (rows == 1) return data[0][0];             // check condition
+    if (rows == 2)                                // check condition
+        return data[0][0]*data[1][1] - data[0][1]*data[1][0];  // return result from function
+    double det = 0;                               // declare and assign variable
+    for (int p = 0; p < cols; p++)                // iterate over elements
     {
-        BasicOperation sub(rows-1, cols-1);                      // submatrix
-        for (int i = 1; i < rows; i++)                           // loop rows (skip 0)
+        BasicOperation sub(rows-1, cols-1);       // call function or method
+        for (int i = 1; i < rows; i++)            // iterate over elements
         {
-            int c = 0;                                           // sub column index
-            for (int j = 0; j < cols; j++)                      // loop all columns
-                if (j != p) { sub.set(i-1, c, data[i][j]); c++; } // skip col p
+            int c = 0;                            // declare and assign variable
+            for (int j = 0; j < cols; j++)        // iterate over elements
+                if (j != p) { sub.set(i-1, c, data[i][j]); c++; }  // check condition
         }
-        det += pow(-1.0, p) * data[0][p] * sub.determinant();   // cofactor term
+        det += pow(-1.0, p) * data[0][p] * sub.determinant();  // update variable with operation
     }
-    return det;                                                  // return result
+    return det;                                   // return result from function
 }
 
-// ---- FRIEND OPERATOR<< ----
-ostream& operator<<(ostream &out, const BasicOperation &b)
+ostream& operator<<(ostream &out, const BasicOperation &b)  // stream input/output operation
 {
-    out << "BasicOperation(" << b.rows << "x" << b.cols << "):\n"; // header line
-    for (int i = 0; i < b.rows; i++)                             // loop rows
+    out << "BasicOperation(" << b.rows << "x" << b.cols << "):\n";  // check equality or comparison
+    for (int i = 0; i < b.rows; i++)              // iterate over elements
     {
-        for (int j = 0; j < b.cols; j++)                        // loop columns
-            out << b.data[i][j] << "\t";                        // print element
-        out << "\n";                                             // newline
+        for (int j = 0; j < b.cols; j++)          // iterate over elements
+            out << b.data[i][j] << "\t";          // check equality or comparison
+        out << "\n";                              // check equality or comparison
     }
-    return out;                                                  // return stream
+    return out;                                   // return result from function
 }
