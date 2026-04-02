@@ -8,6 +8,7 @@
 #include "Include/GaussianElimination.hpp"
 #include "Include/LUDecomposition.hpp"
 #include "Include/Iterativemethod.hpp"
+#include "Include/Eigenvalue.hpp"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ int main()
 {
     try
     {
-        mkdir("Output", 0777);
+        mkdir("Output", 0777);                   // create Output/ folder
 
         int choice;
         cout << "\n========== MATRIX OPERATIONS MENU ==========" << endl;
@@ -33,9 +34,11 @@ int main()
         cout << "12. Matrix Properties & Transforms"              << endl;
         cout << "13. Iterative Method (Gauss-Jacobi)"             << endl;
         cout << "14. Iterative Method (Gauss-Seidel)"             << endl;
+        cout << "15. EigenValue (Gerschgorin Circle Theorem)"     << endl;
         cout << "Enter your choice: " << flush;
         cin >> choice;
 
+        // ── CHOICES 1–3: Two-matrix arithmetic ──────────────────
         if (choice >= 1 && choice <= 3)
         {
             string file1, file2; int r1,c1,r2,c2;
@@ -98,12 +101,14 @@ int main()
             cout<<"Enter coefficient matrix file: "<<flush; cin>>leftFile;
             cout<<"Enter constant vector file: "   <<flush; cin>>rightFile;
             string augFile = "Output/gaussian_pivot_augmented.txt";
-            LinearOperation::generateAugmentedMatrixFile(leftFile, rightFile, augFile);
+            LinearOperation linearOperation;           // create helper object
+            linearOperation.generateAugmentedMatrixFile(leftFile, rightFile, augFile);
             ifstream fin(augFile); int r,c; fin>>r>>c;
             Matrix aug(r,c); aug.readFromFile(fin);
             ofstream matrixOut("Output/gaussian_pivot_matrix.txt");
             ofstream vectorOut("Output/gaussian_pivot_vector.txt");
-            GaussianElimination::gaussianWithPivoting(aug, matrixOut, vectorOut);
+            GaussianElimination gaussianElimination;   // create solver object
+            gaussianElimination.gaussianWithPivoting(aug, matrixOut, vectorOut);
             cout<<"[OUTPUT] Augmented matrix -> Output/gaussian_pivot_augmented.txt"<<endl;
             cout<<"[OUTPUT] Upper triangular -> Output/gaussian_pivot_matrix.txt"   <<endl;
             cout<<"[OUTPUT] Solution vector  -> Output/gaussian_pivot_vector.txt"   <<endl;
@@ -115,12 +120,14 @@ int main()
             cout<<"Enter coefficient matrix file: "<<flush; cin>>leftFile;
             cout<<"Enter constant vector file: "   <<flush; cin>>rightFile;
             string augFile = "Output/gaussian_nopivot_augmented.txt";
-            LinearOperation::generateAugmentedMatrixFile(leftFile, rightFile, augFile);
+            LinearOperation linearOperation;           // create helper object
+            linearOperation.generateAugmentedMatrixFile(leftFile, rightFile, augFile);
             ifstream fin(augFile); int r,c; fin>>r>>c;
             Matrix aug(r,c); aug.readFromFile(fin);
             ofstream matrixOut("Output/gaussian_nopivot_matrix.txt");
             ofstream vectorOut("Output/gaussian_nopivot_vector.txt");
-            GaussianElimination::gaussianWithoutPivoting(aug, matrixOut, vectorOut);
+            GaussianElimination gaussianElimination;   // create solver object
+            gaussianElimination.gaussianWithoutPivoting(aug, matrixOut, vectorOut);
             cout<<"[OUTPUT] Augmented matrix -> Output/gaussian_nopivot_augmented.txt"<<endl;
             cout<<"[OUTPUT] Upper triangular -> Output/gaussian_nopivot_matrix.txt"   <<endl;
             cout<<"[OUTPUT] Solution vector  -> Output/gaussian_nopivot_vector.txt"   <<endl;
@@ -131,7 +138,8 @@ int main()
             string Afile, bfile;
             cout<<"Enter coefficient matrix file: "<<flush; cin>>Afile;
             cout<<"Enter constant vector file: "   <<flush; cin>>bfile;
-            LUDecomposition::doolittleLU(Afile, bfile);
+            LUDecomposition luDecomposition;          // create solver object
+            luDecomposition.doolittleLU(Afile, bfile);
             cout<<"[OUTPUT] Doolittle results saved in Output/"<<endl;
         }
         else if (choice == 10)
@@ -139,7 +147,8 @@ int main()
             string Afile, bfile;
             cout<<"Enter coefficient matrix file: "<<flush; cin>>Afile;
             cout<<"Enter constant vector file: "   <<flush; cin>>bfile;
-            LUDecomposition::croutLU(Afile, bfile);
+            LUDecomposition luDecomposition;          // create solver object
+            luDecomposition.croutLU(Afile, bfile);
             cout<<"[OUTPUT] Crout results saved in Output/"<<endl;
         }
         else if (choice == 11)
@@ -147,7 +156,8 @@ int main()
             string Afile, bfile;
             cout<<"Enter coefficient matrix file: "<<flush; cin>>Afile;
             cout<<"Enter constant vector file: "   <<flush; cin>>bfile;
-            LUDecomposition::choleskyDecomposition(Afile, bfile);
+            LUDecomposition luDecomposition;          // create solver object
+            luDecomposition.choleskyDecomposition(Afile, bfile);
             cout<<"[OUTPUT] Cholesky results saved in Output/"<<endl;
         }
         else if (choice == 12)
@@ -165,7 +175,7 @@ int main()
             A.displayToFile(fout); fout<<endl;
             cout<<"\n--- Property Checks ---"<<endl;
             fout<<"--- Property Checks ---"<<endl;
-            auto yn = [](bool v){ return v?"true":"false"; };
+            auto yn=[](bool v){return v?"true":"false";};
             cout<<"isSquare            : "<<yn(A.isSquare())            <<endl;
             cout<<"isSymmetric         : "<<yn(A.isSymmetric())         <<endl;
             cout<<"isIdentity          : "<<yn(A.isIdentity())          <<endl;
@@ -184,35 +194,23 @@ int main()
             if (file2!="skip") {
                 ifstream fin2(file2);
                 if (!fin2){cout<<"Second file not found."<<endl;}
-                else {
-                    int r2,c2; fin2>>r2>>c2; Matrix B(r2,c2); B.readFromFile(fin2);
-                    bool isTr = A.isTranspose(B);
-                    cout<<"isTranspose(B)      : "<<yn(isTr)<<endl;
-                    fout<<"isTranspose(B)      : "<<yn(isTr)<<endl;
-                }
+                else{int r2,c2;fin2>>r2>>c2;Matrix B(r2,c2);B.readFromFile(fin2);bool iT=A.isTranspose(B);cout<<"isTranspose(B): "<<yn(iT)<<endl;fout<<"isTranspose(B): "<<yn(iT)<<endl;}
             }
             fout<<endl;
-            Matrix T = A.transpose();
-            ofstream ftrans("Output/prop_transpose.txt");
-            ftrans<<T.getRows()<<" "<<T.getCols()<<endl; T.displayToFile(ftrans);
+            Matrix T=A.transpose(); ofstream ft("Output/prop_transpose.txt");
+            ft<<T.getRows()<<" "<<T.getCols()<<endl; T.displayToFile(ft);
             fout<<"--- Transpose ---"<<endl; T.displayToFile(fout); fout<<endl;
             if (A.isSquare()) {
-                Matrix D = A; D.makeDiagonallyDominant();
-                ofstream fdiag("Output/prop_diag_dominant.txt");
-                fdiag<<D.getRows()<<" "<<D.getCols()<<endl; D.displayToFile(fdiag);
+                Matrix D=A; D.makeDiagonallyDominant();
+                ofstream fd("Output/prop_diag_dominant.txt");
+                fd<<D.getRows()<<" "<<D.getCols()<<endl; D.displayToFile(fd);
                 fout<<"--- After makeDiagonallyDominant ---"<<endl; D.displayToFile(fout); fout<<endl;
-                try {
-                    Matrix inv = A.inverse();
-                    ofstream finv("Output/prop_inverse.txt");
-                    finv<<inv.getRows()<<" "<<inv.getCols()<<endl; inv.displayToFile(finv);
-                    fout<<"--- Inverse ---"<<endl; inv.displayToFile(fout); fout<<endl;
-                    cout<<"[OUTPUT] Inverse -> Output/prop_inverse.txt"<<endl;
-                } catch (exception &e){cout<<"Inverse error: "<<e.what()<<endl;}
+                try { Matrix inv=A.inverse(); ofstream fi("Output/prop_inverse.txt"); fi<<inv.getRows()<<" "<<inv.getCols()<<endl; inv.displayToFile(fi); fout<<"--- Inverse ---"<<endl; inv.displayToFile(fout); fout<<endl; cout<<"[OUTPUT] Inverse -> Output/prop_inverse.txt"<<endl;
+                } catch(exception &e){cout<<"Inverse error: "<<e.what()<<endl;}
             }
             cout<<"[OUTPUT] All properties -> Output/properties.txt"   <<endl;
             cout<<"[OUTPUT] Transpose      -> Output/prop_transpose.txt"<<endl;
-            if (A.isSquare())
-                cout<<"[OUTPUT] DiagDominant   -> Output/prop_diag_dominant.txt"<<endl;
+            if (A.isSquare()) cout<<"[OUTPUT] DiagDominant -> Output/prop_diag_dominant.txt"<<endl;
         }
         else if (choice == 13)
         {
@@ -221,7 +219,8 @@ int main()
             cout<<"Enter constant vector file: "       <<flush; cin>>bfile;
             cout<<"Enter max iterations (e.g. 1000): " <<flush; cin>>maxIter;
             cout<<"Enter tolerance (e.g. 1e-10): "     <<flush; cin>>tol;
-            IterativeMethod::gaussJacobi(Afile, bfile, maxIter, tol);
+            IterativeMethod iterativeMethod;          // create solver object
+            iterativeMethod.gaussJacobi(Afile, bfile, maxIter, tol);
         }
         else if (choice == 14)
         {
@@ -230,10 +229,21 @@ int main()
             cout<<"Enter constant vector file: "       <<flush; cin>>bfile;
             cout<<"Enter max iterations (e.g. 1000): " <<flush; cin>>maxIter;
             cout<<"Enter tolerance (e.g. 1e-10): "     <<flush; cin>>tol;
-            IterativeMethod::gaussSeidel(Afile, bfile, maxIter, tol);
+            IterativeMethod iterativeMethod;          // create solver object
+            iterativeMethod.gaussSeidel(Afile, bfile, maxIter, tol);
         }
-        else { cout<<"Invalid choice"<<endl; }
+
+        // ── CHOICE 15: Gerschgorin Circle Theorem ────────────────
+        else if (choice == 15)
+        {
+            string Afile;
+            cout << "Enter square matrix file: " << flush; cin >> Afile;
+            EigenValue eigenValue;                    // create analyzer object
+            eigenValue.gerschgorin(Afile);
+        }
+
+        else { cout << "Invalid choice" << endl; }
     }
-    catch (exception &e) { cout<<"\nError: "<<e.what()<<endl; }
+    catch (exception &e) { cout << "\nError: " << e.what() << endl; }
     return 0;
 }
