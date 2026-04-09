@@ -1,22 +1,21 @@
-#ifndef EIGEN_VALUE_HPP                           // prevent multiple inclusion
-#define EIGEN_VALUE_HPP                           // define header guard
+#ifndef EIGEN_VALUE_HPP         // Guard against double inclusion
+#define EIGEN_VALUE_HPP
 
-#include "Matrix.hpp"                                // include base Matrix class
-#include <string>                                    // for std::string
-#include <vector>                                    // for std::vector
-#include <iostream>                                  // for std::ostream
+#include "Matrix.hpp"               // Base matrix class
+#include <string>                  // For file path handling
+#include <vector>                  // For storing eigenvalue bounds
+#include <iostream>                // Standard input/output
 
-class EigenValue : public Matrix                  // declare class
-{ 
+class EigenValue : public Matrix   // Class for eigenvalue estimation
+{
 public:
 
-    EigenValue();                                 // call function or method
-    EigenValue(int r, int c);                     // declare and initialize object
+    EigenValue();                  // Default constructor
+    EigenValue(int r, int c);      // Constructor with dimensions
 
-    friend std::ostream& operator<<(std::ostream &out, const EigenValue &ev);  // declare function
+    friend std::ostream& operator<<(std::ostream &out, const EigenValue &ev);  // Output operator
 
-    
-    void gerschgorin(const std::string &Afile);   // declare function
+    void gerschgorin(const std::string &Afile);  // Estimate eigenvalues using Gerschgorin circles
 };
 
-#endif                                            // end header guard
+#endif

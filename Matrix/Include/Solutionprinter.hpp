@@ -1,102 +1,102 @@
-#ifndef SOLUTION_PRINTER_HPP                      // prevent multiple inclusion
-#define SOLUTION_PRINTER_HPP                      // define header guard
+#ifndef SOLUTION_PRINTER_HPP
+#define SOLUTION_PRINTER_HPP
 
-#include <vector> // include vector
-#include <string> // include string
-#include <fstream> // include fstream
-#include <iostream> // include iostream
-#include <iomanip> // include iomanip
-#include <cmath> // include cmath
-#include <sstream> // include sstream
+#include <vector>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <sstream>
 
 
-class SolutionPrinter                             // declare class
+class SolutionPrinter
 {
 public:
 
-    void printIterative(                          // execute statement
-        const std::vector<double> &x,             // execute statement
-        const std::string         &methodName,    // declare variable
-        bool                       converged,     // declare variable
-        int                        iterations,    // declare variable
-        double                     finalError,    // declare variable
-        std::ofstream             &vecOut)        // handle file stream operation
+    void printIterative(
+        const std::vector<double> &x,
+        const std::string         &methodName,
+        bool                       converged,
+        int                        iterations,
+        double                     finalError,
+        std::ofstream             &vecOut)
     {
-        std::string header;                       // declare variable
-        std::ostringstream oss;                   // execute statement
+        std::string header;
+        std::ostringstream oss;
 
-        if (converged)                            // check condition
+        if (converged)
         {
-            oss << methodName << " converged in " // stream input/output operation
-                << iterations << " iterations"    // stream input/output operation
-                << " (error = " << std::scientific  // stream input/output operation
-                << std::setprecision(5) << finalError << ")";  // declare function
+            oss << methodName << " converged in "
+                << iterations << " iterations"
+                << " (error = " << std::scientific
+                << std::setprecision(5) << finalError << ")";
         }
-        else                                      // fallback case
+        else
         {
-            oss << methodName << " did NOT converge after "  // stream input/output operation
-                << iterations << " iterations"    // stream input/output operation
-                << " (error = " << std::scientific  // stream input/output operation
-                << std::setprecision(5) << finalError << ")";  // declare function
+            oss << methodName << " did NOT converge after "
+                << iterations << " iterations"
+                << " (error = " << std::scientific
+                << std::setprecision(5) << finalError << ")";
         }
-        header = oss.str();                       // assign value to variable
+        header = oss.str();
 
-        std::cout << "\n" << header << "\n";      // check equality or comparison
-        vecOut    << header << "\n";              // check equality or comparison
+        std::cout << "\n" << header << "\n";
+        vecOut    << header << "\n";
 
-        bool diverged = false;                    // declare and assign variable
-        for (double xi : x)                       // iterate over elements
-            if (std::fabs(xi) > 1e9) { diverged = true; break; }  // check condition
+        bool diverged = false;
+        for (double xi : x)
+            if (std::fabs(xi) > 1e9) { diverged = true; break; }
 
-        if (diverged)                             // check condition
+        if (diverged)
         {
-            std::string warn = "[WARNING] Values diverged — Gauss-Seidel recommended for this matrix.";  // declare and assign variable
-            std::cout << warn << "\n";            // check equality or comparison
-            vecOut    << warn << "\n";            // check equality or comparison
+            std::string warn = "[WARNING] Values diverged — Gauss-Seidel recommended for this matrix.";
+            std::cout << warn << "\n";
+            vecOut    << warn << "\n";
         }
 
-        printSolution(x, vecOut, converged && !diverged);  // call function or method
+        printSolution(x, vecOut, converged && !diverged);
     }
 
-    void printDirect(                             // execute statement
-        const std::vector<double> &x,             // execute statement
-        const std::string         &methodName,    // declare variable
-        std::ofstream             &vecOut)        // handle file stream operation
+    void printDirect(
+        const std::vector<double> &x,
+        const std::string         &methodName,
+        std::ofstream             &vecOut)
     {
-        std::string header = methodName + " \xe2\x80\x94 Solution Vector";  // declare and assign variable
-        std::cout << "\n" << header << "\n";      // check equality or comparison
-        vecOut    << header << "\n";              // check equality or comparison
-        printSolution(x, vecOut, true);           // call function or method
+        std::string header = methodName + " \xe2\x80\x94 Solution Vector";
+        std::cout << "\n" << header << "\n";
+        vecOut    << header << "\n";
+        printSolution(x, vecOut, true);
     }
 
 private:
 
-    void printSolution(                           // execute statement
-        const std::vector<double> &x,             // execute statement
-        std::ofstream             &vecOut,        // handle file stream operation
-        bool                       safe_approx)   // declare variable
+    void printSolution(
+        const std::vector<double> &x,
+        std::ofstream             &vecOut,
+        bool                       safe_approx)
     {
-        int n = (int)x.size();                    // declare and initialize object
-        for (int i = 0; i < n; i++)               // iterate over elements
+        int n = (int)x.size();
+        for (int i = 0; i < n; i++)
         {
-            std::ostringstream oss;               // execute statement
-            oss << "x" << (i+1)                   // stream input/output operation
-                << " = " << std::fixed << std::setprecision(5) << x[i];  // declare function
+            std::ostringstream oss;
+            oss << "x" << (i+1)
+                << " = " << std::fixed << std::setprecision(5) << x[i];
 
-            if (!safe_approx && std::fabs(x[i]) > 1e9)  // check condition
+            if (!safe_approx && std::fabs(x[i]) > 1e9)
             {
-                oss << " \xe2\x89\x88 [DIVERGED]";  // check equality or comparison
+                oss << " \xe2\x89\x88 [DIVERGED]";
             }
-            else                                  // fallback case
+            else
             {
-                long long approx = (long long)std::round(x[i]);  // declare function
-                oss << " \xe2\x89\x88 " << approx;  // check equality or comparison
+                long long approx = (long long)std::round(x[i]);
+                oss << " \xe2\x89\x88 " << approx;
             }
 
-            std::cout << oss.str() << "\n";       // declare function
-            vecOut    << oss.str() << "\n";       // check equality or comparison
+            std::cout << oss.str() << "\n";
+            vecOut    << oss.str() << "\n";
         }
     }
 };
 
-#endif                                            // end header guard
+#endif

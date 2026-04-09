@@ -1,29 +1,29 @@
-#ifndef ITERATIVE_METHOD_HPP                      // prevent multiple inclusion
-#define ITERATIVE_METHOD_HPP                      // define header guard
+#ifndef ITERATIVE_METHOD_HPP   // Guard against double inclusion
+#define ITERATIVE_METHOD_HPP
 
-#include "LinearOperation.hpp" // include LinearOperation.hpp
-#include <string> // include string
-#include <iostream> // include iostream
+#include "LinearOperation.hpp"      // Base class for linear solvers
+#include <string>                   // For file path handling
+#include <iostream>                 // Standard input/output
 
-class IterativeMethod : public LinearOperation    // declare class
-{ 
+class IterativeMethod : public LinearOperation  // Iterative solvers (Jacobi, Seidel)
+{
 public:
-    IterativeMethod();                            // call function or method
-    IterativeMethod(int r, int c);                // declare and initialize object
+    IterativeMethod();               // Default constructor
+    IterativeMethod(int r, int c);   // Constructor with dimensions
 
-    friend std::ostream& operator<<(std::ostream &out, const IterativeMethod &im);  // declare function
+    friend std::ostream& operator<<(std::ostream &out, const IterativeMethod &im);  // Output operator
 
-    void gaussJacobi(                             // execute statement
-        const std::string &Afile,                 // declare variable
-        const std::string &bfile,                 // declare variable
-        int    maxIter,                           // declare variable
-        double tol);                              // declare variable
+    void gaussJacobi(                // Gauss-Jacobi iteration method
+        const std::string &Afile,    // File with coefficient matrix A
+        const std::string &bfile,    // File with constant vector b
+        int    maxIter,              // Maximum number of iterations
+        double tol);                 // Convergence tolerance
 
-    void gaussSeidel(                             // execute statement
-        const std::string &Afile,                 // declare variable
-        const std::string &bfile,                 // declare variable
-        int    maxIter,                           // declare variable
-        double tol);                              // declare variable
+    void gaussSeidel(                // Gauss-Seidel iteration method (faster)
+        const std::string &Afile,    // File with coefficient matrix A
+        const std::string &bfile,    // File with constant vector b
+        int    maxIter,              // Maximum number of iterations
+        double tol);                 // Convergence tolerance
 };
 
-#endif                                            // end header guard
+#endif

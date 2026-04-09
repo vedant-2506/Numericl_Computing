@@ -1,26 +1,26 @@
-#ifndef BASIC_OPERATION_HPP                       // prevent multiple inclusion
-#define BASIC_OPERATION_HPP                       // define header guard
+#ifndef BASIC_OPERATION_HPP    // Guard against double inclusion
+#define BASIC_OPERATION_HPP
 
-#include "Matrix.hpp"                    // include base Matrix class
-#include <iostream>                      // for std::ostream
+#include "Matrix.hpp"                 // Base matrix class
+#include <iostream>                   // Input/output stream
 
-class BasicOperation : public Matrix              // declare class
+class BasicOperation : public Matrix  // Derived class for basic matrix operations
 {
 public:
 
-    BasicOperation();                             // call function or method
-    BasicOperation(int r, int c);                 // declare and initialize object
+    BasicOperation();                 // Default constructor
+    BasicOperation(int r, int c);     // Constructor with dimensions
 
-    BasicOperation add(const BasicOperation &o)      const;  // call function or method
-    BasicOperation subtract(const BasicOperation &o) const;  // call function or method
-    BasicOperation multiply(const BasicOperation &o) const;  // call function or method
-    BasicOperation scalarDivide(double v)            const;  // declare and initialize object
-    BasicOperation scalarMultiply(double v)          const;  // declare and initialize object
+    BasicOperation add(const BasicOperation &o)      const;  // Add two matrices
+    BasicOperation subtract(const BasicOperation &o) const;  // Subtract two matrices
+    BasicOperation multiply(const BasicOperation &o) const;  // Multiply two matrices
+    BasicOperation scalarDivide(double v)            const;  // Divide all elements by scalar
+    BasicOperation scalarMultiply(double v)          const;  // Multiply all elements by scalar
 
-    BasicOperation transpose()   const;           // call function or method
-    double         determinant() const;           // declare and initialize object
+    BasicOperation transpose()   const;  // Flip matrix rows and columns
+    double         determinant() const;  // Calculate determinant value
 
-    friend std::ostream& operator<<(std::ostream &out, const BasicOperation &b);  // declare function
+    friend std::ostream& operator<<(std::ostream &out, const BasicOperation &b);  // Overload output operator
 };
 
-#endif                                            // end header guard
+#endif

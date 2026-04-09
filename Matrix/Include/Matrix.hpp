@@ -1,57 +1,57 @@
-#ifndef MATRIX_HPP                                // prevent multiple inclusion
-#define MATRIX_HPP                                // define header guard
+#ifndef MATRIX_HPP        // Guard to prevent double inclusion
+#define MATRIX_HPP
 
-#include <vector>                                     // for std::vector
-#include <fstream>                                    // for std::ifstream, std::ofstream
-#include <iostream>                                   // for std::istream, std::ostream
+#include <vector>           // For 2D vector storage
+#include <fstream>          // For file input/output
+#include <iostream>         // For standard input/output
 
-class Matrix                                      // declare class
+class Matrix            // Base class for all matrix operations
 {
 protected:
-    int rows;                                     // declare variable
-    int cols;                                     // declare variable
-    std::vector<std::vector<double>> data;        // check equality or comparison
+    int rows;                                    // Number of rows in matrix
+    int cols;                                    // Number of columns in matrix
+    std::vector<std::vector<double>> data;       // 2D data storage with dynamic allocation
 
 public:
 
-    Matrix();                                     // call function or method
-    Matrix(int r, int c);                         // declare and initialize object
-    Matrix(const Matrix &m);                      // call function or method
+    Matrix();                                    // Default constructor, empty matrix
+    Matrix(int r, int c);                        // Constructor with dimensions
+    Matrix(const Matrix &m);                     // Copy constructor
 
-    void readFromFile(std::ifstream &fin);        // handle file stream operation
-    void displayToFile(std::ofstream &fout) const;  // declare function
-    void display() const;                         // call function or method
+    void readFromFile(std::ifstream &fin);       // Read matrix values from file
+    void displayToFile(std::ofstream &fout) const;  // Write matrix to file
+    void display() const;                        // Print matrix to console
 
-    Matrix operator+(const Matrix &m) const;      // call function or method
-    Matrix operator-(const Matrix &m) const;      // call function or method
-    Matrix operator*(const Matrix &m) const;      // call function or method
+    Matrix operator+(const Matrix &m) const;     // Overload + for matrix addition
+    Matrix operator-(const Matrix &m) const;     // Overload - for matrix subtraction
+    Matrix operator*(const Matrix &m) const;     // Overload * for matrix multiplication
 
-    double& operator()(int i, int j);             // declare and initialize object
-    double  operator()(int i, int j) const;       // declare and initialize object
+    double& operator()(int i, int j);            // Access element for modification
+    double  operator()(int i, int j) const;      // Access element for reading
 
-    bool operator==(const Matrix &m) const;       // declare and initialize object
+    bool operator==(const Matrix &m) const;      // Check if two matrices are equal
 
-    friend std::istream& operator>>(std::istream &in,  Matrix &m);  // declare function
-    friend std::ostream& operator<<(std::ostream &out, const Matrix &m);  // declare function
+    friend std::istream& operator>>(std::istream &in,  Matrix &m);  // Read matrix from input stream
+    friend std::ostream& operator<<(std::ostream &out, const Matrix &m);  // Write matrix to output stream
 
-    int    getRows() const;                       // declare and initialize object
-    int    getCols() const;                       // declare and initialize object
-    double get(int i, int j) const;               // declare and initialize object
-    void   set(int i, int j, double v);           // declare and initialize object
-    std::vector<std::vector<double>>& getData();  // declare function
+    int    getRows() const;                      // Get number of rows
+    int    getCols() const;                      // Get number of columns
+    double get(int i, int j) const;              // Get element at position (i,j)
+    void   set(int i, int j, double v);          // Set element at position (i,j)
+    std::vector<std::vector<double>>& getData(); // Get raw data reference
 
-    bool isSquare()             const;            // declare and initialize object
-    bool isSymmetric()          const;            // declare and initialize object
-    bool isIdentity()           const;            // declare and initialize object
-    bool isNull()               const;            // declare and initialize object
-    bool isDiagonal()           const;            // declare and initialize object
-    bool isDiagonallyDominant() const;            // declare and initialize object
-    bool isTranspose(const Matrix &m) const;      // declare and initialize object
+    bool isSquare()             const;           // Check if matrix is square
+    bool isSymmetric()          const;           // Check if matrix is symmetric
+    bool isIdentity()           const;           // Check if matrix is identity
+    bool isNull()               const;           // Check if matrix is null (all zeros)
+    bool isDiagonal()           const;           // Check if matrix is diagonal
+    bool isDiagonallyDominant() const;           // Check diagonal dominance property
+    bool isTranspose(const Matrix &m) const;     // Check if m is transpose of this matrix
 
-    void   makeDiagonallyDominant();              // call function or method
-    Matrix transpose()   const;                   // call function or method
-    double determinant() const;                   // declare and initialize object
-    Matrix inverse()     const;                   // call function or method
+    void   makeDiagonallyDominant();             // Rearrange rows to achieve diagonal dominance
+    Matrix transpose()   const;                  // Return transposed matrix
+    double determinant() const;                  // Calculate matrix determinant
+    Matrix inverse()     const;                  // Calculate matrix inverse
 };
 
-#endif                                            // end header guard
+#endif

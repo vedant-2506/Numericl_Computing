@@ -1,18 +1,18 @@
-#ifndef PLOT_HELPER_HPP                           // prevent multiple inclusion
-#define PLOT_HELPER_HPP                           // define header guard
+#ifndef PLOT_HELPER_HPP         // Guard against double inclusion
+#define PLOT_HELPER_HPP
 
-#include <vector>                        // for std::vector
-#include <string>                        // for std::string
+#include <vector>                  // For storing data points
+#include <string>                  // For file paths
 
-class PlotHelper                                  // declare class
+class PlotHelper              // Utility class to generate plots using Gnuplot
 {
 public:
-    void saveAndPlot(                             // execute statement
-        const std::vector<double> &x,             // execute statement
-        const std::string &datFile,               // declare variable
-        const std::string &gnuFile,               // declare variable
-        const std::string &pngFile,               // declare variable
-        const std::string &title);                // declare variable
+    void saveAndPlot(            // Save data and create plot
+        const std::vector<double> &x,   // Data points to plot
+        const std::string &datFile,     // Output data file path
+        const std::string &gnuFile,     // Gnuplot script file path
+        const std::string &pngFile,     // Output PNG image file path
+        const std::string &title);      // Plot title
 };
 
-#endif                                            // end header guard
+#endif

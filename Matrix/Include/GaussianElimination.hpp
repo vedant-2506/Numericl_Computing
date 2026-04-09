@@ -1,27 +1,27 @@
-#ifndef GAUSSIAN_ELIMINATION_HPP                  // prevent multiple inclusion
-#define GAUSSIAN_ELIMINATION_HPP                  // define header guard
+#ifndef GAUSSIAN_ELIMINATION_HPP  // Guard against double inclusion
+#define GAUSSIAN_ELIMINATION_HPP
 
-#include "LinearOperation.hpp"                        // include parent class
-#include <fstream>                                    // for std::ofstream
+#include "LinearOperation.hpp"         // Base class for linear solvers
+#include <fstream>                     // File operations
 
-class GaussianElimination : public LinearOperation  // declare class
+class GaussianElimination : public LinearOperation  // Solver using Gaussian elimination
 {
 public:
 
-    GaussianElimination();                        // call function or method
-    GaussianElimination(int r, int c);            // declare and initialize object
+    GaussianElimination();             // Default constructor
+    GaussianElimination(int r, int c);  // Constructor with dimensions
 
-    friend std::ostream& operator<<(std::ostream &out, const GaussianElimination &ge);  // declare function
+    friend std::ostream& operator<<(std::ostream &out, const GaussianElimination &ge);  // Output operator
 
-    void gaussianWithPivoting(                    // execute statement
-        Matrix &matrix,                           // execute statement
-        std::ofstream &matrixOut,                 // handle file stream operation
-        std::ofstream &vectorOut);                // handle file stream operation
+    void gaussianWithPivoting(         // Solve using partial pivoting for stability
+        Matrix &matrix,                // Input matrix (will be modified)
+        std::ofstream &matrixOut,      // Output for intermediate matrix
+        std::ofstream &vectorOut);     // Output for solution vector
 
-    void gaussianWithoutPivoting(                 // execute statement
-        Matrix &matrix,                           // execute statement
-        std::ofstream &matrixOut,                 // handle file stream operation
-        std::ofstream &vectorOut);                // handle file stream operation
+    void gaussianWithoutPivoting(      // Solve without pivoting (simpler but less stable)
+        Matrix &matrix,                // Input matrix (will be modified)
+        std::ofstream &matrixOut,      // Output for intermediate matrix
+        std::ofstream &vectorOut);     // Output for solution vector
 };
 
-#endif                                            // end header guard
+#endif

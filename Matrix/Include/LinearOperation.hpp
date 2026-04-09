@@ -1,23 +1,23 @@
-#ifndef LINEAR_OPERATION_HPP                      // prevent multiple inclusion
-#define LINEAR_OPERATION_HPP                      // define header guard
+#ifndef LINEAR_OPERATION_HPP   // Guard against double inclusion
+#define LINEAR_OPERATION_HPP
 
-#include "Matrix.hpp"                    // include base Matrix class
-#include <string>                        // for std::string
-#include <iostream>                      // for std::ostream
+#include "Matrix.hpp"                // Base matrix class
+#include <string>                   // For file path handling
+#include <iostream>                 // Standard input/output
 
-class LinearOperation : public Matrix             // declare class
-{ 
+class LinearOperation : public Matrix  // Base class for linear system solvers
+{
 public:
 
-    LinearOperation();                            // call function or method
-    LinearOperation(int r, int c);                // declare and initialize object
+    LinearOperation();               // Default constructor
+    LinearOperation(int r, int c);   // Constructor with dimensions
 
-    void generateAugmentedMatrixFile(             // execute statement
-        const std::string &leftFile,              // declare variable
-        const std::string &rightFile,             // declare variable
-        const std::string &outputFile);           // declare variable
+    void generateAugmentedMatrixFile(  // Create augmented matrix [A|b] from separate files
+        const std::string &leftFile,   // File with coefficient matrix A
+        const std::string &rightFile,  // File with constant vector b
+        const std::string &outputFile); // Output file for augmented matrix
 
-    friend std::ostream& operator<<(std::ostream &out, const LinearOperation &lo);  // declare function
+    friend std::ostream& operator<<(std::ostream &out, const LinearOperation &lo);  // Output operator
 };
 
-#endif                                            // end header guard
+#endif
