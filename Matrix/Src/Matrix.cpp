@@ -1,14 +1,15 @@
 #include "../Include/Matrix.hpp"           // Include matrix header
 #include <stdexcept>                       // Exception handling
+#include <string>
 using namespace std;
 
-Matrix::Matrix() : rows(0), cols(0) {}                  // Empty matrix constructor
+Matrix::Matrix() : rows(0), cols(0), loaded(false) {}                  // Empty matrix constructor
 
 Matrix::Matrix(int r, int c) : rows(r), cols(c),       // Dimensions constructor
-    data(r, vector<double>(c, 0.0)) {}                // Initialize with zeros
+    data(r, vector<double>(c, 0.0)), loaded(r > 0 && c > 0) {}                // Initialize with zeros
 
 Matrix::Matrix(const Matrix &m) : rows(m.rows),      // Copy constructor
-    cols(m.cols), data(m.data) {}  
+    cols(m.cols), data(m.data), loaded(m.loaded) {}  
 
 int    Matrix::getRows()  const { return rows; }     // Return row count
 int    Matrix::getCols()  const { return cols; }     // Return column count
@@ -23,9 +24,59 @@ double  Matrix::operator()(int i, int j) const { return data[i][j]; }  // Access
 void Matrix::readFromFile(ifstream &fin)                          // Read matrix from file stream
 {
     for (int i = 0; i < rows; i++)  
-        for (int j = 0; j < cols; j++)  
-            fin >> data[i][j];  
+        for (int j = 0; j < cols; j++)
+            if (!(fin >> data[i][j]))
+                throw runtime_error("Matrix::readFromFile: invalid or incomplete matrix data");
+    loaded = true;
 }
+
+bool Matrix::loadFromFile(const string &path, string *errorMessage)
+{
+    ifstream fin(path);
+    if (!fin)
+    {
+        if (errorMessage) *errorMessage = "Cannot open file: " + path;
+        loaded = false;
+        return false;
+    }
+
+    int r = 0, c = 0;
+    if (!(fin >> r >> c) || r <= 0 || c <= 0)
+    {
+        if (errorMessage) *errorMessage = "Invalid matrix header in file: " + path + " (expected positive rows and cols)";
+        loaded = false;
+        return false;
+    }
+
+    vector<vector<double>> temp(r, vector<double>(c, 0.0));
+    for (int i = 0; i < r; i++)
+    {
+        for (int j = 0; j < c; j++)
+        {
+            if (!(fin >> temp[i][j]))
+            {
+                if (errorMessage) *errorMessage = "Invalid or incomplete matrix data in file: " + path;
+                loaded = false;
+                return false;
+            }
+        }
+    }
+
+    rows = r;
+    cols = c;
+    data = temp;
+    loaded = true;
+
+    if (errorMessage) errorMessage->clear();
+    return true;
+}
+
+bool Matrix::isLoadFile(const string &path, string *errorMessage)
+{
+    return loadFromFile(path, errorMessage);
+}
+
+bool Matrix::isLoaded() const { return loaded; }
 
 void Matrix::displayToFile(ofstream &fout) const  // Write matrix to file
 {
