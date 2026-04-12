@@ -4,6 +4,7 @@
 #include <vector>           // For 2D vector storage
 #include <fstream>          // For file input/output
 #include <iostream>         // For standard input/output
+#include <string>           // For file paths and error messages
 
 class Matrix            // Base class for all matrix operations
 {
@@ -11,6 +12,7 @@ protected:
     int rows;                                    // Number of rows in matrix
     int cols;                                    // Number of columns in matrix
     std::vector<std::vector<double>> data;       // 2D data storage with dynamic allocation
+    bool loaded;                                 // Tracks whether matrix data is available
 
 public:
 
@@ -19,6 +21,9 @@ public:
     Matrix(const Matrix &m);                     // Copy constructor
 
     void readFromFile(std::ifstream &fin);       // Read matrix values from file
+    bool isLoadFile(const std::string &path, std::string *errorMessage = nullptr);  // Validate/load file for user workflow
+    bool loadFromFile(const std::string &path, std::string *errorMessage = nullptr);  // Safe file loader
+    bool isLoaded() const;                       // Check if matrix has loaded/initialized data
     void displayToFile(std::ofstream &fout) const;  // Write matrix to file
     void display() const;                        // Print matrix to console
 
