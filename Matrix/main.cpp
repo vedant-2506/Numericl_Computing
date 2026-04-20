@@ -27,6 +27,7 @@ int main()
     cout << "14. Iterative Method (Gauss-Seidel)" << endl;
     cout << "15. EigenValue (Gerschgorin Circle Theorem)" << endl;
     cout << "16. Interpolation (Lagrange Method)" << endl;
+    cout << "17. Curve Fitting (Least Squares Method)" << endl;
     cout << "Enter your choice: " << flush;
 
     if (!(cin >> choice))
@@ -53,6 +54,7 @@ int main()
         case 14: return workflow.runGaussSeidel();
         case 15: return workflow.runEigenvalue();
         case 16: return workflow.runLagrange();
+        case 17: return workflow.runLeastSquare();
         default:
             cout << "Invalid choice" << endl;
             return 0;
