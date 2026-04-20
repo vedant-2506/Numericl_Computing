@@ -11,6 +11,7 @@
 #include "../Include/Eigenvalue.hpp"
 #include "../Include/GaussianElimination.hpp"
 #include "../Include/Iterativemethod.hpp"
+#include "../Include/LeastSquare.hpp"
 #include "../Include/LUDecomposition.hpp"
 #include "../Include/Lagrange.hpp"
 #include "../Include/LinearOperation.hpp"
@@ -544,6 +545,65 @@ int MatrixUserWorkflow::runLagrange()
     catch (exception &e)
     {
         cout << "Interpolation error: " << e.what() << endl;
+    }
+
+    return 0;
+}
+
+int MatrixUserWorkflow::runLeastSquare()
+{
+    if (!ensureOutputDirectory())
+        return 0;
+
+    string pointsFile;
+    cout << "Enter curve fitting points file: " << flush;
+    cin >> pointsFile;
+
+    ifstream pointIn(pointsFile);
+    if (!pointIn)
+    {
+        cout << "Input error: cannot open curve fitting points file." << endl;
+        return 0;
+    }
+
+    int degree = 1;
+    cout << "Enter polynomial degree (>= 0): " << flush;
+    if (!(cin >> degree))
+    {
+        cout << "Invalid input: degree must be an integer." << endl;
+        return 0;
+    }
+
+    double xQuery = 0.0;
+    cout << "Enter query x-value for prediction: " << flush;
+    if (!(cin >> xQuery))
+    {
+        cout << "Invalid input: query x-value must be numeric." << endl;
+        return 0;
+    }
+
+    ofstream fout("Output/least_square.txt");
+    if (!fout)
+    {
+        cout << "Output error: cannot open Output/least_square.txt" << endl;
+        return 0;
+    }
+
+    try
+    {
+        LeastSquare leastSquare;
+        leastSquare.loadSamplePoints(pointIn);
+
+        vector<double> coefficients = leastSquare.fit(degree, fout);
+        double prediction = leastSquare.predict(xQuery, coefficients, fout);
+
+        cout << "Fitted polynomial degree " << degree << " successfully." << endl;
+        cout << "Predicted value f(" << xQuery << ") = " << prediction << endl;
+        cout << "[OUTPUT] Detailed steps -> Output/least_square.txt" << endl;
+    }
+    catch (exception &e)
+    {
+        cout << "Least square error: " << e.what() << endl;
     }
 
     return 0;
