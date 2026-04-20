@@ -22,6 +22,7 @@ public:
     int runGaussSeidel();
     int runEigenvalue();
     int runLagrange();
+    int runLeastSquare();
 
 private:
     bool ensureOutputDirectory();
