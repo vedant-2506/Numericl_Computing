@@ -1,6 +1,5 @@
 #ifndef MATRIX_USER_WORKFLOW_HPP
 #define MATRIX_USER_WORKFLOW_HPP
-
 #include <string>
 
 class MatrixUserWorkflow
@@ -23,16 +22,15 @@ public:
     int runEigenvalue();
     int runLagrange();
     int runLeastSquare();
+    int runLeastSquareParabola();       // NEW: polynomial curve fitting + graph
 
 private:
     bool ensureOutputDirectory();
-
     bool loadBasic(const std::string &path, class BasicOperation &out);
     bool loadMatrixData(const std::string &path, class Matrix &out);
-
-    int handleBasicOps(int choice);
-    int handleGaussian(bool withPivoting);
-    int handleIterative(bool jacobi);
+    int  handleBasicOps(int choice);
+    int  handleGaussian(bool withPivoting);
+    int  handleIterative(bool jacobi);
 };
 
 #endif

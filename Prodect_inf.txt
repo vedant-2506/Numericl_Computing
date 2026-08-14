@@ -1,0 +1,415 @@
+Listed directory Numericl_Computing
+Listed directory Complex
+Listed directory Graphs
+Listed directory Lab-test
+Listed directory Matrix
+Listed directory RootFinding
+Listed directory Include
+Listed directory Src
+Listed directory Include
+Listed directory Src
+Listed directory Include
+Listed directory Src
+Listed directory Tested
+Listed directory lib
+Viewed Complex.hpp:1-34
+Viewed Complex.cpp:1-66
+Viewed main.cpp:1-65
+Viewed Root.hpp:1-46
+Viewed Root.cpp:1-187
+Viewed main.cpp:1-31
+Viewed README.md:1-213
+Viewed Makefile:1-50
+Viewed GnuplotHelper.hpp:1-48
+Viewed Lagrange.hpp:1-42
+Viewed WeatherDataHandler.hpp:1-29
+Viewed GnuplotHelper.cpp:1-204
+Viewed Lagrange.cpp:1-284
+Viewed WeatherDataHandler.cpp:1-214
+Viewed main.cpp:1-162
+Viewed Matrix.hpp:1-62
+Viewed BasicOperation.hpp:1-26
+Viewed LinearOperation.hpp:1-23
+Viewed GaussianElimination.hpp:1-27
+Viewed LUDecomposition.hpp:1-30
+Viewed Iterativemethod.hpp:1-29
+Viewed Eigenvalue.hpp:1-21
+Viewed CurveFitting.hpp:1-25
+Viewed Interpolation.hpp:1-22
+Viewed Lagrange.hpp:1-21
+Viewed LeastSquare.hpp:1-22
+Viewed LeastSquareParabola.hpp:1-42
+Viewed MatrixUserWorkflow.hpp:1-36
+Viewed PlotHelper.hpp:1-29
+Viewed Solutionprinter.hpp:1-102
+Viewed main.cpp:1-62
+Viewed Matrix.cpp:1-115
+Viewed BasicOperation.cpp:1-100
+Viewed LinearOperation.cpp:1-51
+Viewed GaussianElimination.cpp:1-101
+Viewed DoolittleLU.cpp:1-79
+Viewed CroutLU.cpp:1-73
+Viewed Cholesky.cpp:1-71
+Viewed Iterativemethod.cpp:1-312
+Viewed Eigenvalue.cpp:1-167
+Viewed CurveFitting.cpp:1-66
+Viewed Interpolation.cpp:1-57
+Viewed Lagrange.cpp:1-152
+Viewed LeastSquare.cpp:1-270
+Viewed LeastSquareParabola.cpp:1-267
+Viewed MatrixUtils.cpp:1-143
+Viewed Matrixops.cpp:1-50
+Viewed MatrixUserWorkflow.cpp:1-698
+Viewed PlotHelper.cpp:1-104
+
+Here is a detailed, line-by-line, and file-by-file architectural and mathematical analysis of your **C++ Numerical Computing Library** project.
+
+---
+
+# 📚 PROJECT STRUCTURE OVERVIEW
+
+The repository is structured into modular sub-directories, each addressing a core domain of Numerical Computing:
+
+```
+Numericl_Computing/
+├── Complex/             # Complex Number Arithmetic Engine
+├── RootFinding/         # Non-Linear Equation Root-Finding Algorithms
+├── Lab-test/            # Weather Station Temperature Analysis (Lagrange Application)
+├── Matrix/              # Matrix Algebra, Linear Systems, Eigenvalues & Curve Fitting
+└── Graphs/              # Visualizations produced by Gnuplot (.png)
+```
+
+---
+
+# 1. 📁 `Complex/` Directory (Complex Number Engine)
+
+### **File: `Complex/Complex.hpp`**
+* **Purpose**: Defines the `Complex` class representing complex numbers ($z = a + bi$).
+* **Mathematical Concept**: Complex algebra in standard Cartesian form $a + bi$.
+* **Connections**: Included by `Complex/Complex.cpp` and `Complex/main.cpp`.
+* **Functions & Members**:
+  * `float real, img`: Public member variables storing real ($a$) and imaginary ($b$) parts.
+  * `Complex()`: Default constructor to initialize an empty object.
+  * `Complex(float r, float i)`: Parameterized constructor for setting $a$ and $b$.
+  * `Complex add(Complex &c)`: Calculates $z_1 + z_2 = (a_1 + a_2) + (b_1 + b_2)i$.
+  * `Complex subtract(Complex &c)`: Calculates $z_1 - z_2 = (a_1 - a_2) + (b_1 - b_2)i$.
+  * `Complex multiply(Complex &c)`: Calculates $z_1 \cdot z_2 = (a_1 a_2 - b_1 b_2) + (a_1 b_2 + a_2 b_1)i$.
+  * `Complex divide(Complex &c)`: Calculates $\frac{z_1}{z_2} = \frac{(a_1 a_2 + b_1 b_2) + (b_1 a_2 - a_1 b_2)i}{a_2^2 + b_2^2}$.
+  * `Complex conjugate()`: Calculates $\bar{z} = a - bi$.
+  * `float norm()`: Calculates modulus $|z| = \sqrt{a^2 + b^2}$.
+
+---
+
+### **File: `Complex/Complex.cpp`**
+* **Purpose**: Implements the member functions declared in `Complex.hpp`.
+* **Problem Solved**: Provides fundamental complex arithmetic needed for signal processing, electrical engineering, and complex analysis.
+* **Connections**: Includes `Complex.hpp`, `<iostream>`, and `<cmath>`.
+
+---
+
+### **File: `Complex/main.cpp`**
+* **Purpose**: CLI user interface for testing `Complex` operations interactively.
+* **Connections**: Includes `Complex.hpp` and `<iostream>`.
+* **Workflow**:
+  1. Prompts user to input real and imaginary components for two complex numbers ($c_1, c_2$).
+  2. Demonstrates `.add()`, `.subtract()`, `.multiply()`, `.divide()`, `.conjugate()`, and `.norm()`.
+  3. Displays formatted results ($a + bi$) on the console.
+
+---
+
+# 2. 📁 `RootFinding/` Directory (Non-Linear Equations)
+
+### **File: `RootFinding/Include/Root.hpp`**
+* **Purpose**: Header declaring the `RootFinder` polymorphic base class and three derived root-finding algorithms.
+* **Connections**: Included by `RootFinding/Src/Root.cpp` and `RootFinding/main.cpp`.
+* **Classes & Functions**:
+  * `class RootFinder`: Abstract base class.
+    * `double tol`: Tolerance for convergence criterion ($|x_{k+1} - x_k| < \text{tol}$).
+    * `virtual double f(double x)`: Defines target function $f(x)=0$.
+    * `virtual double solve() = 0`: Pure virtual function overridden by each solver.
+  * `class Bisection : public RootFinder`:
+    * `bool findInterval()`: Scans intervals $[-5, 5]$ with step $0.05$ to find $[a, b]$ where $f(a)\cdot f(b) < 0$ (Bolzano's Theorem).
+    * `double solve()`: Implements Bisection method.
+  * `class NewtonRaphson : public RootFinder`:
+    * `double df(double x)`: Evaluates the derivative $f'(x)$.
+    * `double solve()`: Solves using tangent iteration $x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}$.
+  * `class FixedPoint : public RootFinder`:
+    * `double g(double x)`: Rearranged iteration function $x = g(x)$.
+    * `double solve()`: Solves using fixed-point iteration $x_{k+1} = g(x_k)$.
+
+---
+
+### **File: `RootFinding/Src/Root.cpp`**
+* **Purpose**: Implements algorithms for bracket finding, Bisection, Newton-Raphson, and Fixed Point iteration.
+* **Mathematical Methods**:
+  * **Bisection**: Repeatedly halves interval $[a, b]$ where $m = \frac{a+b}{2}$. Halves error bound each step: $O(\log_2(\frac{b-a}{\text{tol}}))$.
+  * **Newton-Raphson**: Quadratic convergence algorithm using tangent line intersections.
+  * **Fixed-Point Iteration**: Solves $g(x) = x$, guaranteed to converge when $|g'(x)| < 1$.
+* **Connections**: Includes `Root.hpp`, `<iostream>`, `<cmath>`, and `<iomanip>`.
+
+---
+
+### **File: `RootFinding/main.cpp`**
+* **Purpose**: Console entry point allowing users to choose a root-finding algorithm.
+* **Connections**: Includes `Include/Root.hpp`.
+* **Workflow**: Uses base class pointer polymorphism (`RootFinder* solver`) to instantiate `Bisection`, `NewtonRaphson`, or `FixedPoint`, calls `solver->solve()`, outputs the root, and deletes memory.
+
+---
+
+# 3. 📁 `Lab-test/` Directory (Weather Station Temperature Analysis)
+
+### **File: `Lab-test/Include/Lagrange.hpp`**
+* **Purpose**: Header for performing Lagrange polynomial interpolation on non-uniform spatial/temporal weather data.
+* **Connections**: Included by `Lab-test/Src/Lagrange.cpp` and `Lab-test/main.cpp`.
+* **Functions**:
+  * `setData(x, y)`: Loads data vectors and checks for duplicate $x$ nodes.
+  * `basisPolynomial(i, x, fout)`: Computes individual Lagrange basis polynomial $L_i(x) = \prod_{j \neq i} \frac{x - x_j}{x_i - x_j}$ and logs full mathematical steps.
+  * `allBasisValues(x)`: Vectorized calculation of all $L_i(x)$.
+  * `interpolate(xQuery, fout)`: Calculates $P(x) = \sum_{i=0}^{n-1} y_i L_i(x)$ and verifies $\sum L_i(x) = 1.0$ (Partition of Unity).
+
+---
+
+### **File: `Lab-test/Include/WeatherDataHandler.hpp`**
+* **Purpose**: Header for file parsing and user input validation for weather data files.
+* **Connections**: Included by `Lab-test/Src/WeatherDataHandler.cpp` and `Lab-test/main.cpp`.
+* **Functions**:
+  * `readDataFromFile(filename, xData, yData)`: Parses standard space/tab delimited data or pipe-separated clock formats (`HH:MM` $\rightarrow$ decimal hours).
+  * `printDataToConsole(...)`: Prints tabular dataset.
+  * `getQueryPointFromUser()`: Prompts user for target estimation timestamp.
+
+---
+
+### **File: `Lab-test/Include/GnuplotHelper.hpp`**
+* **Purpose**: Header for Gnuplot visualization file generation.
+* **Connections**: Included by `Lab-test/Src/GnuplotHelper.cpp` and `Lab-test/main.cpp`.
+* **Functions**:
+  * `generateLagrangeVisualization(...)`: Writes data and Gnuplot script `lagrange_plot.gnu` to generate PNG of dataset, polynomial curve, and query point.
+  * `generateHeatmap(...)`: Creates 2D temperature palette/heatmap plot `heatmap.gnu`.
+  * `writeDataFile(...)`: Utility helper writing $(x, y)$ coordinate files.
+
+---
+
+### **File: `Lab-test/Src/Lagrange.cpp`**
+* **Purpose**: Implements Lagrange interpolation, mathematical basis construction, logging, and verification.
+* **Math Concept**: Lagrange Polynomial Interpolation $P(x) = \sum y_i L_i(x)$.
+* **Connections**: Includes `Lagrange.hpp`, `<cmath>`, `<iomanip>`, `<stdexcept>`.
+
+---
+
+### **File: `Lab-test/Src/WeatherDataHandler.cpp`**
+* **Purpose**: Implements flexible file reading logic for multiple weather station dataset formats.
+* **Connections**: Includes `WeatherDataHandler.hpp`, `<fstream>`, `<sstream>`, `<cctype>`.
+
+---
+
+### **File: `Lab-test/Src/GnuplotHelper.cpp`**
+* **Purpose**: Implements automatic script generation for Gnuplot curve plotting and temperature heatmaps.
+* **Connections**: Includes `GnuplotHelper.hpp`, `<fstream>`, `<iomanip>`, `<cmath>`.
+
+---
+
+### **File: `Lab-test/main.cpp`**
+* **Purpose**: Main driver for weather station temperature estimation task.
+* **Workflow**: Loads dataset from `Input/weather_data.txt`, prints dataset, reads timestamp query, evaluates temperature via `Lagrange`, writes step-by-step calculations to `Output/lagrange_detailed_results.txt`, and generates Gnuplot plot files.
+* **Connections**: Includes `Lagrange.hpp`, `WeatherDataHandler.hpp`, `GnuplotHelper.hpp`.
+
+---
+
+# 4. 📁 `Matrix/` Directory (Comprehensive Matrix & Linear Algebra Engine)
+
+---
+
+## 4.1 Base Matrix Storage & Operations
+
+### **File: `Matrix/Include/Matrix.hpp`**
+* **Purpose**: Base class for matrix representation, storage, operator overloading, and properties.
+* **Connections**: Included by all matrix module headers (`BasicOperation.hpp`, `LinearOperation.hpp`, `Interpolation.hpp`, `CurveFitting.hpp`, `Eigenvalue.hpp`).
+* **Functions**:
+  * 2D vector storage `std::vector<std::vector<double>> data`.
+  * Element access: `operator()(i, j)`, `get()`, `set()`.
+  * File I/O: `loadFromFile()`, `displayToFile()`, `display()`.
+  * Operators: `+`, `-`, `*`, `==`, `>>`, `<<`.
+  * Property checkers: `isSquare()`, `isSymmetric()`, `isIdentity()`, `isNull()`, `isDiagonal()`, `isDiagonallyDominant()`, `isTranspose()`.
+  * Matrix utilities: `makeDiagonallyDominant()`, `transpose()`, `determinant()`, `inverse()`.
+
+---
+
+### **File: `Matrix/Src/Matrix.cpp`**
+* **Purpose**: Implements constructors, file loader, stream operators, and accessors.
+* **Connections**: Includes `Matrix.hpp`, `<stdexcept>`.
+
+---
+
+### **File: `Matrix/Src/Matrixops.cpp`**
+* **Purpose**: Implements matrix arithmetic operators (`+`, `-`, `*`) and equality check (`==`).
+* **Mathematical Operations**:
+  * Matrix Addition/Subtraction: $C_{ij} = A_{ij} \pm B_{ij}$
+  * Matrix Multiplication: $C_{ij} = \sum_{k} A_{ik} B_{kj}$ ($O(n^3)$ complexity).
+* **Connections**: Includes `Matrix.hpp`, `<stdexcept>`, `<cmath>`.
+
+---
+
+### **File: `Matrix/Src/MatrixUtils.cpp`**
+* **Purpose**: Implements property checks and transformations (Determinant, Inverse, Row Swapping for Diagonal Dominance).
+* **Mathematical Methods**:
+  * **Determinant**: Recursive cofactor expansion $det(A) = \sum (-1)^j a_{1j} det(M_{1j})$.
+  * **Inverse**: Gauss-Jordan elimination on augmented $[A | I] \rightarrow [I | A^{-1}]$.
+  * **Diagonal Dominance Transformation**: Swaps rows to satisfy $|a_{ii}| \ge \sum_{j \neq i} |a_{ij}|$.
+* **Connections**: Includes `Matrix.hpp`, `<cmath>`, `<stdexcept>`.
+
+---
+
+## 4.2 Matrix Operations & Linear System Solvers
+
+### **File: `Matrix/Include/BasicOperation.hpp` & `Matrix/Src/BasicOperation.cpp`**
+* **Purpose**: Class derived from `Matrix` for standard linear algebra tasks (Matrix Addition, Subtraction, Multiplication, Scalar Operations, Transposition, Determinant).
+* **Connections**: Includes `BasicOperation.hpp`, `Matrix.hpp`.
+
+---
+
+### **File: `Matrix/Include/LinearOperation.hpp` & `Matrix/Src/LinearOperation.cpp`**
+* **Purpose**: Base class for linear system solvers ($Ax = b$).
+* **Key Function**: `generateAugmentedMatrixFile(leftFile, rightFile, outputFile)` reads coefficient matrix $A$ and constant vector $b$, creating augmented matrix file $[A | b]$.
+* **Connections**: Includes `LinearOperation.hpp`, `Matrix.hpp`.
+
+---
+
+### **File: `Matrix/Include/GaussianElimination.hpp` & `Matrix/Src/GaussianElimination.cpp`**
+* **Purpose**: Direct solver for system $Ax = b$ using Gaussian Elimination.
+* **Methods**:
+  * `gaussianWithPivoting(...)`: Performs partial pivoting (swapping rows for largest column pivot $|a_{ik}|$) to maintain numerical stability and eliminate divide-by-zero errors.
+  * `gaussianWithoutPivoting(...)`: Standard forward elimination into upper triangular matrix followed by back-substitution.
+* **Connections**: Includes `GaussianElimination.hpp`, `PlotHelper.hpp`, `Solutionprinter.hpp`.
+
+---
+
+### **File: `Matrix/Include/LUDecomposition.hpp` & Implementation Files (`DoolittleLU.cpp`, `CroutLU.cpp`, `Cholesky.cpp`)**
+* **Purpose**: Solves $Ax = b$ by decomposing $A$ into lower ($L$) and upper ($U$) triangular matrices.
+* **Methods**:
+  1. **Doolittle LU** (`DoolittleLU.cpp`): $A = LU$ where $L$ has 1s on main diagonal ($l_{ii} = 1$). Solves $Ly = b$ then $Ux = y$.
+  2. **Crout LU** (`CroutLU.cpp`): $A = LU$ where $U$ has 1s on main diagonal ($u_{ii} = 1$). Solves $Ly = b$ then $Ux = y$.
+  3. **Cholesky Decomposition** (`Cholesky.cpp`): Decomposes symmetric positive-definite matrix $A = L L^T$ where $l_{ii} = \sqrt{a_{ii} - \sum_{k=0}^{i-1} l_{ik}^2}$.
+* **Connections**: Includes `LUDecomposition.hpp`, `PlotHelper.hpp`, `Solutionprinter.hpp`.
+
+---
+
+### **File: `Matrix/Include/Iterativemethod.hpp` & `Matrix/Src/Iterativemethod.cpp`**
+* **Purpose**: Solves $Ax = b$ using iterative numerical methods.
+* **Methods**:
+  1. **Gauss-Jacobi Iteration**: Solves $x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij} x_j^{(k)} \right)$ using values from previous iteration.
+  2. **Gauss-Seidel Iteration**: Solves $x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j < i} a_{ij} x_j^{(k+1)} - \sum_{j > i} a_{ij} x_j^{(k)} \right)$ using updated values immediately for faster convergence.
+* **Feature**: Automatically checks diagonal dominance and attempts row reordering if matrix is not dominant.
+* **Connections**: Includes `Iterativemethod.hpp`, `PlotHelper.hpp`, `Solutionprinter.hpp`.
+
+---
+
+## 4.3 Eigenvalues & Curve Fitting
+
+### **File: `Matrix/Include/Eigenvalue.hpp` & `Matrix/Src/Eigenvalue.cpp`**
+* **Purpose**: Bounds real/complex eigenvalues of square matrices.
+* **Math Concept**: **Gerschgorin Circle Theorem**. Every eigenvalue $\lambda$ of matrix $A$ lies within at least one Gerschgorin disc $D(a_{ii}, R_i)$ in the complex plane, where center is $a_{ii}$ and radius is $R_i = \sum_{j \neq i} |a_{ij}|$.
+* **Connections**: Includes `Eigenvalue.hpp`, `Matrix.hpp`, system Gnuplot calls.
+
+---
+
+### **File: `Matrix/Include/Interpolation.hpp` & `Matrix/Src/Interpolation.cpp`**
+* **Purpose**: Abstract base class for table-based interpolation. Validates input dataset coordinates $(x_i, y_i)$.
+* **Connections**: Includes `Interpolation.hpp`, `Matrix.hpp`.
+
+---
+
+### **File: `Matrix/Include/Lagrange.hpp` & `Matrix/Src/Lagrange.cpp` (in Matrix/)**
+* **Purpose**: Implements Lagrange interpolation integrated with Matrix framework.
+* **Connections**: Includes `Lagrange.hpp`, `Interpolation.hpp`.
+
+---
+
+### **File: `Matrix/Include/CurveFitting.hpp` & `Matrix/Src/CurveFitting.cpp`**
+* **Purpose**: Abstract base class for statistical regression and polynomial curve fitting.
+* **Connections**: Includes `CurveFitting.hpp`, `Matrix.hpp`.
+
+---
+
+### **File: `Matrix/Include/LeastSquare.hpp` & `Matrix/Src/LeastSquare.cpp`**
+* **Purpose**: Fits polynomial $f(x) = a_0 + a_1 x + a_2 x^2 + \dots + a_m x^m$ to $n$ data points using Method of Least Squares.
+* **Math Concept**: Minimizes Residual Sum of Squares (RSS): $\min \sum (y_i - f(x_i))^2$. Solves Normal Equations $(X^T X) c = X^T y$ where $X$ is Vandermonde matrix. Computes RSS, MSE, RMSE.
+* **Connections**: Includes `LeastSquare.hpp`, `CurveFitting.hpp`.
+
+---
+
+### **File: `Matrix/Include/LeastSquareParabola.hpp` & `Matrix/Src/LeastSquareParabola.cpp`**
+* **Purpose**: Specialized polynomial & parabolic regression solver. Computes coefficients and automatically calls Gnuplot to render fitted curves and scatter points to PNG files.
+* **Connections**: Includes `LeastSquareParabola.hpp`, `CurveFitting.hpp`, `Matrix.hpp`.
+
+---
+
+## 4.4 Utilities, Workflow & Main
+
+### **File: `Matrix/Include/Solutionprinter.hpp`**
+* **Purpose**: Header-only utility class formatting output vectors for linear system solvers and flagging divergence when $|x_i| > 10^9$.
+* **Connections**: Included by `GaussianElimination.cpp`, `DoolittleLU.cpp`, `CroutLU.cpp`, `Cholesky.cpp`, `Iterativemethod.cpp`.
+
+---
+
+### **File: `Matrix/Include/PlotHelper.hpp` & `Matrix/Src/PlotHelper.cpp`**
+* **Purpose**: Generates Gnuplot data files (`.dat`), scripts (`.gnu`), and executes Gnuplot to render graphs (`.png`).
+* **Connections**: Includes `PlotHelper.hpp`, `<cstdlib>`.
+
+---
+
+### **File: `Matrix/Include/MatrixUserWorkflow.hpp` & `Matrix/Src/MatrixUserWorkflow.cpp`**
+* **Purpose**: Workflow controller mapping user menu choices to backend algorithms. Handles file opening, error reporting, output folder creation (`Output/`), and parameter input.
+* **Connections**: Includes all algorithm headers (`BasicOperation.hpp`, `GaussianElimination.hpp`, `LUDecomposition.hpp`, `Iterativemethod.hpp`, `Eigenvalue.hpp`, `Lagrange.hpp`, `LeastSquare.hpp`, `LeastSquareParabola.hpp`).
+
+---
+
+### **File: `Matrix/main.cpp`**
+* **Purpose**: Main entry point for the `Matrix` library.
+* **Workflow**: Displays an 18-choice CLI menu and routes choice to corresponding function in `MatrixUserWorkflow`.
+* **Connections**: Includes `Include/MatrixUserWorkflow.hpp`.
+
+---
+
+# 🔗 SUMMARY OF LINKAGES & CONNECTIONS
+
+```mermaid
+graph TD
+    Main[Matrix/main.cpp] --> Workflow[MatrixUserWorkflow]
+    Workflow --> Basic[BasicOperation]
+    Workflow --> Gauss[GaussianElimination]
+    Workflow --> LU[LUDecomposition]
+    Workflow --> Iterative[IterativeMethod]
+    Workflow --> Eigen[EigenValue]
+    Workflow --> Interp[Lagrange Interpolation]
+    Workflow --> Fit[LeastSquare / LeastSquareParabola]
+
+    Basic --> BaseMatrix[Matrix Base Class]
+    Gauss --> LinearOp[LinearOperation Base Class]
+    LU --> LinearOp
+    Iterative --> LinearOp
+    LinearOp --> BaseMatrix
+    Eigen --> BaseMatrix
+    Interp --> InterpBase[Interpolation Base Class]
+    InterpBase --> BaseMatrix
+    Fit --> FitBase[CurveFitting Base Class]
+    FitBase --> BaseMatrix
+
+    Gauss --> SolPrint[SolutionPrinter]
+    LU --> SolPrint
+    Iterative --> SolPrint
+
+    Gauss --> Plot[PlotHelper / Gnuplot]
+    LU --> Plot
+    Iterative --> Plot
+    Fit --> Plot
+    Eigen --> Plot
+```
+
+---
+
+# 🎯 KEY ADVANTAGES & DESIGN HIGHLIGHTS
+
+1. **Object-Oriented Architecture**: Clean inheritance hierarchy with `Matrix` acting as standard data container and operation handler.
+2. **Numerical Stability**: Includes partial pivoting in Gaussian Elimination and normal equation solving, and checks diagonal dominance for iterative convergence.
+3. **Automated Visualization**: Direct integration with Gnuplot to generate PNG graph visualizations.
+4. **Detailed Logging**: Algorithms write step-by-step intermediate matrices, basis polynomials, and residual metrics to output files.

@@ -1,0 +1,53 @@
+╔════════════════════════════════════════════════════════════╗
+║        LAGRANGE INTERPOLATION SUMMARY REPORT               ║
+╚════════════════════════════════════════════════════════════╝
+
+DATA INFORMATION:
+  Total Data Points: 23
+  Time Range: 18.00 to 23.83 hours
+  Temperature Range: 24.2 to 32.4 °C
+
+INTERPOLATION REQUEST:
+  Query Point: 26.00 hours
+  Interpolation Method: Lagrange Polynomial
+  Polynomial Degree: 22
+
+RESULT:
+  Estimated Temperature: 43567791301.026108 °C
+
+BASIS POLYNOMIAL VALUES AT x = 26.00:
+Index | L_i(x) Value
+------|-------------------
+    0 | 8412206.5804716442
+    1 | -79190529.2709523141
+    2 | 587064133.9274090528
+    3 | -4663669836.4787101746
+    4 | 22863126314.3195915222
+    5 | -94669189105.9344635010
+    6 | 168961552859.4599609375
+    7 | -277707350711.8452758789
+    8 | 511705578931.7881469727
+    9 | -946368596611.2202148438
+   10 | 1291127126035.9443359375
+   11 | -1559561383059.4809570312
+   12 | 1633136222192.6625976562
+   13 | -1193128844505.5383300781
+   14 | 767580177239.0615234375
+   15 | -447380057213.0701904297
+   16 | 181463744760.3757324219
+   17 | -76016683840.1297302246
+   18 | 28755468260.5091209412
+   19 | -7917247297.3454875946
+   20 | 1396506389.4059529305
+   21 | -99406540.7802509665
+   22 | 6639928.0608490864
+
+Verification: Sum of all L_i = 1.0010938207 (should be 1.0)
+
+OUTPUT FILES GENERATED:
+  - lagrange_detailed_results.txt (detailed calculation)
+  - interpolation_summary.txt (this file)
+  - weather_data.txt (original data)
+  - interpolation_curve.txt (polynomial curve)
+  - lagrange_plot.gnu (GnuPlot visualization script)
+  - lagrange_interpolation.png (generated plot)

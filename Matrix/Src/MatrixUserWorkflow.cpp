@@ -16,6 +16,7 @@
 #include "../Include/Lagrange.hpp"
 #include "../Include/LinearOperation.hpp"
 #include "../Include/Matrix.hpp"
+#include "../Include/LeastSquareParabola.hpp"
 
 using namespace std;
 
@@ -248,7 +249,10 @@ int MatrixUserWorkflow::handleGaussian(bool withPivoting)
     cout << "Enter constant vector file: " << flush;
     cin >> rightFile;
 
-    string augFile = withPivoting ? "Output/gaussian_pivot_augmented.txt" : "Output/gaussian_nopivot_augmented.txt";
+    string augFile = withPivoting
+        ? "Output/gaussian_pivot_augmented.txt"
+        : "Output/gaussian_nopivot_augmented.txt";
+
     LinearOperation linearOperation;
     linearOperation.generateAugmentedMatrixFile(leftFile, rightFile, augFile);
 
@@ -256,8 +260,13 @@ int MatrixUserWorkflow::handleGaussian(bool withPivoting)
     if (!loadMatrixData(augFile, aug))
         return 0;
 
-    ofstream matrixOut(withPivoting ? "Output/gaussian_pivot_matrix.txt" : "Output/gaussian_nopivot_matrix.txt");
-    ofstream vectorOut(withPivoting ? "Output/gaussian_pivot_vector.txt" : "Output/gaussian_nopivot_vector.txt");
+    ofstream matrixOut(withPivoting
+        ? "Output/gaussian_pivot_matrix.txt"
+        : "Output/gaussian_nopivot_matrix.txt");
+    ofstream vectorOut(withPivoting
+        ? "Output/gaussian_pivot_vector.txt"
+        : "Output/gaussian_nopivot_vector.txt");
+
     if (!matrixOut || !vectorOut)
     {
         cout << "Output error: cannot open gaussian output files." << endl;
@@ -386,9 +395,7 @@ int MatrixUserWorkflow::runProperties()
     {
         Matrix B;
         if (!loadMatrixData(file2, B))
-        {
             cout << "Input error: second matrix cannot be loaded." << endl;
-        }
         else
         {
             bool iT = A.isTranspose(B);
@@ -607,5 +614,85 @@ int MatrixUserWorkflow::runLeastSquare()
     }
 
     return 0;
-}
+}   // <-- runLeastSquare ends here
 
+int MatrixUserWorkflow::runLeastSquareParabola()
+{
+    if (!ensureOutputDirectory())
+        return 0;
+
+    // ── 1. Ask for input file ──
+    string inputPath;
+    cout << "\nEnter path to data file (format: N\\nx1 y1\\n...): " << flush;
+    cin >> inputPath;
+
+    // ── 2. Load data points ──
+    LeastSquareParabola lsp;
+    ifstream fin(inputPath);
+    if (!fin)
+    {
+        cout << "Error: Cannot open file: " << inputPath << endl;
+        return 1;
+    }
+    try
+    {
+        lsp.loadSamplePoints(fin);
+    }
+    catch (const exception &e)
+    {
+        cout << "Error loading data: " << e.what() << endl;
+        return 1;
+    }
+    fin.close();
+
+    // ── 3. Ask for polynomial degree ──
+    int degree = 2;
+    cout << "Enter polynomial degree (default 2 for parabola): " << flush;
+    if (!(cin >> degree) || degree < 1 || degree > 10)
+    {
+        cout << "Invalid degree. Using 2.\n";
+        degree = 2;
+    }
+
+    // ── 4. Open output file ──
+    string outTxt = "Output/least_square_parabola.txt";
+    string outPng = "Output/least_square_parabola.png";
+    ofstream fout(outTxt);
+    if (!fout)
+    {
+        cout << "Error: Cannot create output file: " << outTxt << endl;
+        return 1;
+    }
+
+    // ── 5. Print sample points ──
+    lsp.printSamplePoints(fout);
+
+    // ── 6. Fit and write results ──
+    vector<double> coeffs;
+    try
+    {
+        coeffs = lsp.fit(degree, fout);
+    }
+    catch (const exception &e)
+    {
+        cout << "Fitting error: " << e.what() << endl;
+        return 1;
+    }
+    fout.close();
+
+    cout << "Results written to: " << outTxt << endl;
+
+    // ── 7. Generate PNG graph via Gnuplot ──
+    try
+    {
+        lsp.plotGraph(coeffs, degree, outPng);
+        cout << "Graph saved to:    " << outPng << endl;
+    }
+    catch (const exception &e)
+    {
+        cout << "Warning: Graph generation failed: " << e.what() << endl;
+        cout << "(Make sure gnuplot is installed)" << endl;
+    }
+
+    return 0;
+}

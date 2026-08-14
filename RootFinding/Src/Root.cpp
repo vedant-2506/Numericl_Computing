@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
-#include "../Src/Root.hpp"
+#include "../Include/Root.hpp"
 
 //Base class
 RootFinder::RootFinder(double tolerance) {
