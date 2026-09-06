@@ -30,7 +30,9 @@ NumericalDifferentiation::NumericalDifferentiation()
             fn->getDerivativeExpression(),
             fn->getGraphStem(),
             [fn](double x) { return fn->evaluate(x); },
-            [fn](double x) { return fn->exactDerivative(x); }
+            [fn](double x) { return fn->exactDerivative(x); },
+            [fn](long double x) { return fn->evaluateLong(x); },
+            [fn](long double x) { return fn->exactDerivativeLong(x); }
         });
     }
 }
@@ -206,7 +208,7 @@ void NumericalDifferentiation::writeFunctionBlock(ofstream &out,
 {
     auto formatScientific = [](double value) {
         ostringstream stream;
-        stream << scientific << setprecision(12) << value;
+        stream << scientific << setprecision(15) << value;
         return stream.str();
     };
 
@@ -251,6 +253,23 @@ void NumericalDifferentiation::writeFunctionBlock(ofstream &out,
         {
             out << setw(18) << formatScientific(sample.h) << " | "
                 << setw(22) << formatScientific(sample.functionAtMinus) << " | "
+                << setw(24) << formatScientific(sample.numericalDerivative) << " | "
+                << setw(20) << formatScientific(sample.absoluteError) << '\n';
+        }
+    }
+    else if (methodName == "Richardson Extrapolation")
+    {
+        out << setw(18) << "h" << " | "
+            << setw(20) << "D(h)" << " | "
+            << setw(20) << "D(h/2)" << " | "
+            << setw(24) << "Richardson R(h)" << " | "
+            << setw(20) << "Absolute Error" << '\n';
+        out << string(114, '-') << '\n';
+        for (const DifferentiationSample &sample : result.samples)
+        {
+            out << setw(18) << formatScientific(sample.h) << " | "
+                << setw(20) << formatScientific(sample.functionAtPlus) << " | "
+                << setw(20) << formatScientific(sample.functionAtMinus) << " | "
                 << setw(24) << formatScientific(sample.numericalDerivative) << " | "
                 << setw(20) << formatScientific(sample.absoluteError) << '\n';
         }

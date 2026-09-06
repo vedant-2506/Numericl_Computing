@@ -17,6 +17,9 @@ public:
 
     virtual double evaluate(double x) const = 0;
     virtual double exactDerivative(double x) const = 0;
+
+    virtual long double evaluateLong(long double x) const { return evaluate(static_cast<double>(x)); }
+    virtual long double exactDerivativeLong(long double x) const { return exactDerivative(static_cast<double>(x)); }
 };
 
 // f(x) = e^x
@@ -30,6 +33,9 @@ public:
 
     double evaluate(double x) const override { return std::exp(x); }
     double exactDerivative(double x) const override { return std::exp(x); }
+
+    long double evaluateLong(long double x) const override { return std::exp(x); }
+    long double exactDerivativeLong(long double x) const override { return std::exp(x); }
 };
 
 // f(x) = sin(x)
@@ -43,6 +49,9 @@ public:
 
     double evaluate(double x) const override { return std::sin(x); }
     double exactDerivative(double x) const override { return std::cos(x); }
+
+    long double evaluateLong(long double x) const override { return std::sin(x); }
+    long double exactDerivativeLong(long double x) const override { return std::cos(x); }
 };
 
 // f(x) = cos(x)
@@ -56,6 +65,9 @@ public:
 
     double evaluate(double x) const override { return std::cos(x); }
     double exactDerivative(double x) const override { return -std::sin(x); }
+
+    long double evaluateLong(long double x) const override { return std::cos(x); }
+    long double exactDerivativeLong(long double x) const override { return -std::sin(x); }
 };
 
 // f(x) = x^2 + 2x + 1
@@ -69,6 +81,9 @@ public:
 
     double evaluate(double x) const override { return x * x + 2.0 * x + 1.0; }
     double exactDerivative(double x) const override { return 2.0 * x + 2.0; }
+
+    long double evaluateLong(long double x) const override { return x * x + 2.0L * x + 1.0L; }
+    long double exactDerivativeLong(long double x) const override { return 2.0L * x + 2.0L; }
 };
 
 #endif

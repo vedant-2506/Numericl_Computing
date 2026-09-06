@@ -17,6 +17,8 @@ struct TestFunctionSpec
     std::string graphStem;
     std::function<double(double)> function;
     std::function<double(double)> exactDerivative;
+    std::function<long double(long double)> functionLong;
+    std::function<long double(long double)> exactDerivativeLong;
 };
 
 // Stores the numerical evaluation data and absolute error for one specific step size h.
@@ -75,7 +77,7 @@ public:
     // Saves formatted numerical result tables and absolute errors to an output file.
     void writeResultsToFile(const MethodResult &result) const;
 
-private:
+protected:
     std::vector<double> hValues;
     std::vector<TestFunctionSpec> testFunctions;
     std::vector<std::shared_ptr<TestFunction>> polymorphicFunctions;

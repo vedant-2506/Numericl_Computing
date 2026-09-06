@@ -2,6 +2,7 @@
 #define GRAPH_HELPER_HPP
 
 #include "NumericalDifferentiation.hpp"
+#include "InterpolationData.hpp"
 #include <string>
 
 // Separates calculation data from graph generation to maintain single responsibility.
@@ -12,6 +13,9 @@ public:
 
     // Generates log-transformed error-vs-h plots for all test functions using gnuplot.
     void generateGraphs(const MethodResult &result) const;
+
+    // Generates a polynomial curve with original and queried interpolation points.
+    void generateInterpolationGraph(const InterpolationResult &result) const;
 
 private:
     // Creates the directory for output artifacts if it does not already exist.
@@ -35,6 +39,21 @@ private:
                          const std::string &pngFile,
                          const FunctionResult &functionResult,
                          const std::string &methodName) const;
+
+    void writeInterpolationData(const InterpolationResult &result,
+                                const std::string &curveFile,
+                                const std::string &pointsFile,
+                                const std::string &queriesFile,
+                                double &minimumX,
+                                double &maximumX) const;
+
+    void writeInterpolationScript(const InterpolationResult &result,
+                                  const std::string &scriptFile,
+                                  const std::string &curveFile,
+                                  const std::string &pointsFile,
+                                  const std::string &queriesFile,
+                                  double minimumX,
+                                  double maximumX) const;
 };
 
 #endif

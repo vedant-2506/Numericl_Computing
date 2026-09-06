@@ -1,5 +1,6 @@
 #include "../Include/GraphHelper.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cerrno>
 #include <cstdlib>
@@ -136,5 +137,112 @@ void GraphHelper::generateGraphs(const MethodResult &result) const
             cout << "Graph generation error for " << functionResult.spec.name << ": " << e.what() << endl;
         }
     }
+}
+
+void GraphHelper::writeInterpolationData(const InterpolationResult &result,
+                                         const string &curveFile,
+                                         const string &pointsFile,
+                                         const string &queriesFile,
+                                         double &minimumX,
+                                         double &maximumX) const
+{
+    if (result.xValues.empty() || result.xValues.size() != result.yValues.size())
+        throw invalid_argument("Interpolation graph requires matching input data.");
+
+    minimumX = *min_element(result.xValues.begin(), result.xValues.end());
+    maximumX = *max_element(result.xValues.begin(), result.xValues.end());
+    for (const InterpolationQuery &query : result.queries)
+    {
+        minimumX = min(minimumX, query.x);
+        maximumX = max(maximumX, query.x);
+    }
+
+    const double span = maximumX - minimumX;
+    const double margin = span > 0.0 ? span * 0.1 : 1.0;
+    minimumX -= margin;
+    maximumX += margin;
+
+    auto evaluatePolynomial = [&result](double x) {
+        double value = 0.0;
+        for (auto coefficient = result.polynomialCoefficients.rbegin();
+             coefficient != result.polynomialCoefficients.rend(); ++coefficient)
+            value = value * x + *coefficient;
+        return value;
+    };
+
+    ofstream curve(curveFile);
+    ofstream points(pointsFile);
+    ofstream queries(queriesFile);
+    if (!curve || !points || !queries)
+        throw runtime_error("Cannot create interpolation graph data files.");
+
+    curve << scientific << setprecision(12);
+    points << scientific << setprecision(12);
+    queries << scientific << setprecision(12);
+
+    const size_t sampleCount = 500;
+    for (size_t sample = 0; sample <= sampleCount; ++sample)
+    {
+        const double x = minimumX + (maximumX - minimumX) * static_cast<double>(sample) / sampleCount;
+        curve << x << ' ' << evaluatePolynomial(x) << '\n';
+    }
+    for (size_t index = 0; index < result.xValues.size(); ++index)
+        points << result.xValues[index] << ' ' << result.yValues[index] << '\n';
+    for (const InterpolationQuery &query : result.queries)
+        queries << query.x << ' ' << query.y << '\n';
+}
+
+void GraphHelper::writeInterpolationScript(const InterpolationResult &result,
+                                           const string &scriptFile,
+                                           const string &curveFile,
+                                           const string &pointsFile,
+                                           const string &queriesFile,
+                                           double minimumX,
+                                           double maximumX) const
+{
+    ofstream out(scriptFile);
+    if (!out)
+        throw runtime_error("Cannot create graph script: " + scriptFile);
+
+    out << "set terminal pngcairo size 1000,650 enhanced font 'Helvetica,13'\n";
+    out << "set output '" << result.graphFile << "'\n";
+    out << "set title '" << result.methodName << "' font 'Helvetica,16'\n";
+    out << "set xlabel 'x'\n";
+    out << "set ylabel 'f(x)'\n";
+    out << "set xrange [" << minimumX << ":" << maximumX << "]\n";
+    out << "set grid lc rgb '#cccccc' lw 1\n";
+    out << "set key outside\n";
+    out << "plot '" << curveFile << "' using 1:2 with lines lw 2 lc rgb '#1f77b4' title 'Interpolation Polynomial', "
+        << "'" << pointsFile << "' using 1:2 with points pt 7 ps 1.5 lc rgb '#222222' title 'Input Data Points', "
+        << "'" << queriesFile << "' using 1:2 with points pt 9 ps 1.8 lc rgb '#d62728' title 'Queried Point'\n";
+}
+
+void GraphHelper::generateInterpolationGraph(const InterpolationResult &result) const
+{
+    ensureDirectory("Output");
+    ensureDirectory("Graphs");
+
+    const string stem = result.methodName == "Lagrange Interpolation"
+                            ? "LagrangeInterpolation"
+                            : "NewtonInterpolation";
+    const string curveFile = "Output/" + stem + "_curve.dat";
+    const string pointsFile = "Output/" + stem + "_points.dat";
+    const string queriesFile = "Output/" + stem + "_queries.dat";
+    const string scriptFile = "Output/" + stem + ".gnu";
+
+    double minimumX = 0.0;
+    double maximumX = 0.0;
+    writeInterpolationData(result, curveFile, pointsFile, queriesFile, minimumX, maximumX);
+    writeInterpolationScript(result, scriptFile, curveFile, pointsFile, queriesFile, minimumX, maximumX);
+
+    const int status = system(("gnuplot \"" + scriptFile + "\"").c_str());
+    remove(scriptFile.c_str());
+    remove(curveFile.c_str());
+    remove(pointsFile.c_str());
+    remove(queriesFile.c_str());
+    if (status != 0)
+        throw runtime_error("gnuplot failed for " + result.graphFile);
+
+    cout << "[OUTPUT] Graph -> " << result.graphFile << endl;
 }
 
