@@ -6,9 +6,13 @@
 #include <vector>
 
 #include "Include/GraphHelper.hpp"
+#include "Include/PowerMethod.hpp"
 #include "Include/LagrangeInterpolation.hpp"
 #include "Include/NewtonInterpolation.hpp"
 #include "Include/RichardsonExtrapolation.hpp"
+#include "Include/Simpsons13Rule.hpp"
+#include "Include/Simpsons38Rule.hpp"
+#include "Include/TrapezoidalRule.hpp"
 
 using namespace std;
 
@@ -104,6 +108,9 @@ void runInterpolation(GraphHelper &graphHelper)
 int main() {
   try {
     RichardsonExtrapolation differentiation;
+    TrapezoidalRule trapezoidalRule;
+    Simpsons13Rule simpsons13Rule;
+    Simpsons38Rule simpsons38Rule;
     GraphHelper graphHelper;
 
     int choice = 0;
@@ -117,7 +124,11 @@ int main() {
     cout << "4. Richardson Extrapolation\n";
     cout << "5. Lagrange Interpolation\n";
     cout << "6. Newton Interpolation\n";
-    cout << "7. Exit\n\n";
+    cout << "7. Trapezoidal Rule\n";
+    cout << "8. Simpson's 1/3 Rule\n";
+    cout << "9. Simpson's 3/8 Rule\n";
+    cout << "10. Power Method\n";
+    cout << "11. Exit\n\n";
     cout << "Enter your choice: " << flush;
 
     if (!(cin >> choice)) {
@@ -146,6 +157,45 @@ int main() {
       runInterpolation<NewtonInterpolation>(graphHelper);
       return 0;
     case 7:
+      {
+        const TrapezoidalResult integrationResult = trapezoidalRule.processTrapezoidalRule();
+        trapezoidalRule.writeResultsToFile(integrationResult);
+        cout << "[OUTPUT] Results -> " << integrationResult.outputFile << endl;
+        graphHelper.generateTrapezoidalGraph(integrationResult);
+        return 0;
+      }
+    case 8:
+        {
+          const Simpsons13Result integrationResult = simpsons13Rule.processSimpsons13Rule();
+          simpsons13Rule.writeResultsToFile(integrationResult);
+          cout << "[OUTPUT] Results -> " << integrationResult.outputFile << endl;
+          graphHelper.generateSimpsons13Graph(integrationResult);
+          graphHelper.generateSimpsons13ErrorGraph(integrationResult);
+          return 0;
+        }
+      case 9:
+        {
+          const Simpsons38Result integrationResult = simpsons38Rule.processSimpsons38Rule();
+          simpsons38Rule.writeResultsToFile(integrationResult);
+          cout << "[OUTPUT] Results -> " << integrationResult.outputFile << endl;
+          graphHelper.generateSimpsons38Graph(integrationResult);
+          graphHelper.generateSimpsons38ErrorGraph(integrationResult);
+          return 0;
+        }
+      case 10:
+      {
+        cout << "Enter matrix filename (.txt, stored in Input/): " << flush;
+        string matrixFilename;
+        cin >> matrixFilename;
+        PowerMethod powerMethod;
+        const PowerMethodResult powerResult = powerMethod.process(matrixFilename);
+        powerMethod.writeResultsToFile(powerResult);
+        cout << "[OUTPUT] Results -> " << powerResult.outputFile << endl;
+        graphHelper.generatePowerMethodGraph(powerResult);
+        cout << "[SUMMARY] " << powerResult.status << endl;
+        return 0;
+      }
+      case 11:
       cout << "Exit." << endl;
       return 0;
     default:

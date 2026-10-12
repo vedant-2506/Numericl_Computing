@@ -79,6 +79,7 @@ void LagrangeInterpolation::validateData() const
     }
 }
 
+// Calculates each Lagrange basis polynomial for polynomial construction.
 vector<double> LagrangeInterpolation::buildBasisPolynomial(size_t index) const
 {
     vector<double> basis(1, 1.0);
@@ -156,6 +157,7 @@ InterpolationResult LagrangeInterpolation::buildResult(const vector<double> &que
     result.graphFile = "Graphs/LagrangeInterpolation.png";
     result.xValues = xValues;
     result.yValues = yValues;
+    // Stores polynomial data so the interpolation curve can be evaluated and plotted.
     result.polynomialCoefficients = polynomialCoefficients;
     result.polynomialExpression = formatPolynomial();
 
@@ -217,6 +219,11 @@ void LagrangeInterpolation::writeResultsToFile(const InterpolationResult &result
     }
 
     out << "\n" << result.polynomialExpression << "\n";
-    for (const InterpolationQuery &query : result.queries)
-        out << "Requested x = " << query.x << "\nInterpolated f(x) = " << query.y << "\n";
+    if (!result.queries.empty())
+    {
+        out << "\nRequested Points\n----------------\n"
+            << left << setw(18) << "x" << "f(x)\n" << string(32, '-') << '\n';
+        for (const InterpolationQuery &query : result.queries)
+            out << setw(18) << query.x << query.y << '\n';
+    }
 }

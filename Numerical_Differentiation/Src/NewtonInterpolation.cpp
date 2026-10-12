@@ -72,6 +72,7 @@ void NewtonInterpolation::validateData() const
     }
 }
 
+// Builds the divided-difference table used by Newton interpolation.
 void NewtonInterpolation::buildDividedDifferenceTable()
 {
     const size_t pointCount = xValues.size();
@@ -141,6 +142,7 @@ InterpolationResult NewtonInterpolation::buildResult(const vector<double> &query
     result.graphFile = "Graphs/NewtonInterpolation.png";
     result.xValues = xValues;
     result.yValues = yValues;
+    // Stores polynomial data so the interpolation curve can be evaluated and plotted.
     result.polynomialCoefficients = polynomialCoefficients;
     result.dividedDifferenceTable = dividedDifferenceTable;
     result.polynomialExpression = formatPolynomial();
@@ -185,6 +187,11 @@ void NewtonInterpolation::writeResultsToFile(const InterpolationResult &result) 
 
     out << "\nNewton Interpolation Polynomial\n-------------------------------\n"
         << result.polynomialExpression << "\n";
-    for (const InterpolationQuery &query : result.queries)
-        out << "\nRequested x = " << query.x << "\nInterpolated f(x) = " << query.y << '\n';
+    if (!result.queries.empty())
+    {
+        out << "\nRequested Points\n----------------\n"
+            << left << setw(18) << "x" << "f(x)\n" << string(32, '-') << '\n';
+        for (const InterpolationQuery &query : result.queries)
+            out << setw(18) << query.x << query.y << '\n';
+    }
 }

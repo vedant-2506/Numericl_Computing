@@ -4,7 +4,7 @@
 #include "InterpolationData.hpp"
 #include "NumericalDifferentiation.hpp"
 
-// Inherits the common numerical-method base while handling user-provided interpolation data.
+// Inherits the common numerical-method interface used by the project.
 class LagrangeInterpolation : public NumericalDifferentiation
 {
 public:
@@ -16,6 +16,7 @@ public:
     void writeResultsToFile(const InterpolationResult &result) const;
 
 private:
+    // Stores user-provided points used to construct the interpolation polynomial.
     std::vector<double> xValues;
     std::vector<double> yValues;
     std::vector<double> polynomialCoefficients;
